@@ -1,0 +1,627 @@
+<title>Eight Refusals</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root {
+    --ground:      #F5F6F9;
+    --surface:     #FFFFFF;
+    --surface-alt: #EDEFF4;
+    --ink:         #14203A;
+    --ink-soft:    #3D4A66;
+    --muted:       #6B7691;
+    --rule:        #DCE0E9;
+    --rule-strong: #C3CAD8;
+    --crimson:     #9E1B22;
+    --crimson-dim: #C4565B;
+    --crimson-wash:#F7EAEA;
+    --green:       #14624E;
+    --green-wash:  #E6F0EC;
+
+    --measure: 64ch;
+    --step-0: 1.0625rem;
+    --step-1: 1.1875rem;
+    --step-2: 1.5rem;
+    --step-3: 2rem;
+  }
+
+  :root:not([data-theme="light"]) {
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:      #0D1320;
+      --surface:     #141C2C;
+      --surface-alt: #1B2437;
+      --ink:         #E7EBF3;
+      --ink-soft:    #BAC3D4;
+      --muted:       #8D99B1;
+      --rule:        #262F45;
+      --rule-strong: #35405B;
+      --crimson:     #E06A70;
+      --crimson-dim: #B14F55;
+      --crimson-wash:#2A1A1F;
+      --green:       #4FB394;
+      --green-wash:  #11251F;
+      color-scheme: dark;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground:      #0D1320;
+    --surface:     #141C2C;
+    --surface-alt: #1B2437;
+    --ink:         #E7EBF3;
+    --ink-soft:    #BAC3D4;
+    --muted:       #8D99B1;
+    --rule:        #262F45;
+    --rule-strong: #35405B;
+    --crimson:     #E06A70;
+    --crimson-dim: #B14F55;
+    --crimson-wash:#2A1A1F;
+    --green:       #4FB394;
+    --green-wash:  #11251F;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: var(--step-0);
+    line-height: 1.68;
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 60rem;
+    margin: 0 auto;
+    padding: clamp(2rem, 5vw, 4.5rem) clamp(1.15rem, 4vw, 2.5rem) 5rem;
+  }
+
+  .col { max-width: var(--measure); }
+
+  p { margin: 0 0 1.1em; }
+  p:last-child { margin-bottom: 0; }
+
+  strong { font-weight: 600; }
+
+  /* ---------- masthead ---------- */
+
+  .masthead { margin-bottom: clamp(2.5rem, 6vw, 4rem); }
+
+  .masthead__rule {
+    width: 4.5rem;
+    height: 4px;
+    background: var(--crimson);
+    margin-bottom: 1.75rem;
+  }
+
+  h1 {
+    font-family: Spectral, Georgia, "Times New Roman", serif;
+    font-weight: 600;
+    font-size: clamp(2.5rem, 6.5vw, 3.75rem);
+    line-height: 1.06;
+    letter-spacing: -0.015em;
+    margin: 0 0 0.6rem;
+    text-wrap: balance;
+  }
+
+  .masthead__sub {
+    font-family: Spectral, Georgia, serif;
+    font-style: italic;
+    font-size: clamp(1.1rem, 2.4vw, 1.375rem);
+    line-height: 1.5;
+    color: var(--ink-soft);
+    max-width: 46ch;
+    margin: 0 0 1.75rem;
+  }
+
+  .masthead__meta {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.78rem;
+    color: var(--muted);
+    line-height: 1.85;
+    border-top: 1px solid var(--rule);
+    padding-top: 1rem;
+  }
+
+  /* ---------- prose ---------- */
+
+  h2 {
+    font-family: Spectral, Georgia, serif;
+    font-weight: 600;
+    font-size: var(--step-3);
+    line-height: 1.18;
+    letter-spacing: -0.01em;
+    margin: 0 0 1rem;
+    text-wrap: balance;
+  }
+
+  .section { margin-top: clamp(3rem, 7vw, 4.75rem); }
+
+  .section__head {
+    border-top: 2px solid var(--ink);
+    padding-top: 1.25rem;
+    margin-bottom: 2rem;
+  }
+
+  .lede { font-size: var(--step-1); color: var(--ink-soft); }
+
+  blockquote {
+    margin: 1.75rem 0;
+    padding-left: 1.35rem;
+    border-left: 3px solid var(--crimson);
+    font-family: Spectral, Georgia, serif;
+    font-style: italic;
+    font-size: var(--step-1);
+    line-height: 1.55;
+    color: var(--ink);
+  }
+  blockquote cite {
+    display: block;
+    margin-top: 0.6rem;
+    font-family: "IBM Plex Sans", sans-serif;
+    font-style: normal;
+    font-size: 0.78rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ---------- gates ---------- */
+
+  .gates {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-top: 2rem;
+  }
+
+  .gate {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--crimson);
+    display: grid;
+    grid-template-columns: 4.25rem 1fr;
+  }
+
+  .gate__num {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--crimson);
+    padding: 1.4rem 0 0 1.15rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .gate__body { padding: 1.4rem 1.5rem 1.5rem 0; min-width: 0; }
+
+  .eyebrow {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: var(--crimson);
+    margin: 0 0 0.4rem;
+  }
+
+  .gate h3 {
+    font-family: Spectral, Georgia, serif;
+    font-weight: 600;
+    font-size: 1.3rem;
+    line-height: 1.3;
+    margin: 0 0 1rem;
+    text-wrap: balance;
+  }
+
+  .exchange {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.8125rem;
+    line-height: 1.6;
+  }
+
+  .line {
+    display: grid;
+    grid-template-columns: 5.25rem 1fr;
+    gap: 0.75rem;
+    padding: 0.6rem 0.85rem;
+    background: var(--surface-alt);
+    overflow-x: auto;
+  }
+
+  .line--refused { background: var(--crimson-wash); }
+  .line--allowed { background: var(--green-wash); }
+
+  .tag {
+    font-size: 0.66rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding-top: 0.2rem;
+  }
+  .line--refused .tag { color: var(--crimson); }
+  .line--allowed .tag { color: var(--green); }
+
+  .line span:last-child { min-width: 0; }
+
+  .note {
+    font-family: "IBM Plex Sans", sans-serif;
+    font-size: 0.875rem;
+    color: var(--muted);
+    margin-top: 0.75rem;
+    line-height: 1.6;
+  }
+
+  /* ---------- hash diff ---------- */
+
+  .hashes {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    padding: 1.4rem 1.5rem;
+    margin-top: 1.5rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8125rem;
+    overflow-x: auto;
+  }
+
+  .hash-row {
+    display: grid;
+    grid-template-columns: 7rem 1fr;
+    gap: 0.9rem;
+    padding: 0.4rem 0;
+    white-space: nowrap;
+  }
+  .hash-row + .hash-row { border-top: 1px dashed var(--rule); }
+
+  .hash-row .tag { padding-top: 0; }
+  .match { color: var(--muted); }
+  .differ { color: var(--crimson); font-weight: 500; }
+
+  /* ---------- install ---------- */
+
+  .paths {
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+    margin-top: 2rem;
+  }
+
+  .path {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-top: 3px solid var(--ink);
+    padding: 1.4rem 1.5rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .path h3 {
+    font-family: Spectral, Georgia, serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  .path p { font-size: 0.9375rem; color: var(--ink-soft); margin: 0; }
+
+  pre {
+    background: var(--surface-alt);
+    border: 1px solid var(--rule);
+    padding: 0.85rem 1rem;
+    margin: 0;
+    overflow-x: auto;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.8125rem;
+    line-height: 1.7;
+    color: var(--ink);
+  }
+  pre .cmt { color: var(--muted); }
+  code { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.9em; }
+  p code, li code {
+    background: var(--surface-alt);
+    padding: 0.08em 0.34em;
+    border: 1px solid var(--rule);
+  }
+
+  .skills {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1.75rem;
+  }
+  .skill {
+    display: grid;
+    grid-template-columns: minmax(0, 13rem) 1fr;
+    gap: 1.25rem;
+    padding: 1.1rem 0;
+    border-top: 1px solid var(--rule);
+    align-items: baseline;
+  }
+  .skill code {
+    color: var(--crimson);
+    font-weight: 500;
+    font-size: 0.9375rem;
+  }
+  .skill p { font-size: 0.9375rem; margin: 0; color: var(--ink-soft); }
+
+  /* ---------- closing ---------- */
+
+  .admits {
+    border: 1px solid var(--rule-strong);
+    border-left: 3px solid var(--muted);
+    background: var(--surface);
+    padding: 1.5rem 1.65rem;
+    margin-top: 2rem;
+  }
+  .admits h3 {
+    font-family: Spectral, Georgia, serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0 0 0.75rem;
+  }
+  .admits p { font-size: 0.9375rem; color: var(--ink-soft); }
+
+  footer {
+    margin-top: 4rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--rule);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+    line-height: 1.9;
+  }
+
+  @media (max-width: 34rem) {
+    .gate { grid-template-columns: 1fr; }
+    .gate__num { padding: 1.15rem 1.15rem 0; }
+    .gate__body { padding: 0.5rem 1.15rem 1.25rem; }
+    .line { grid-template-columns: 1fr; gap: 0.2rem; }
+    .hash-row { grid-template-columns: 1fr; gap: 0.15rem; }
+    .skill { grid-template-columns: 1fr; gap: 0.35rem; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="masthead__rule"></div>
+    <h1>Eight Refusals</h1>
+    <p class="masthead__sub">What the engine says when someone tries to do the convenient thing — and why none of it required anyone to be watching.</p>
+    <div class="masthead__meta">
+      TACTIK · Santiago Doctrine 1.0.0<br>
+      tactik_eval 0.1.0 · 56 tests · no dependencies<br>
+      transcript of <code>python3 examples/demo_gates.py</code>
+    </div>
+  </header>
+
+  <div class="col">
+    <p class="lede">The doctrine makes an argument about where rules have to live. It is worth taking literally, because it decides how the whole thing gets built.</p>
+
+    <blockquote>
+      A principle applied when convenient is not a principle; it is a preference. The engine is the only place where a rule cannot be waived under pressure.
+      <cite>The Santiago Doctrine, page 2</cite>
+    </blockquote>
+
+    <p>A rule written into a prompt, or trained into a model's weights, is advice. A sufficiently persuasive situation talks it out of the rule — and pressure is exactly when these rules matter, because that is when a founder most wants the number to be flattering.</p>
+
+    <p>A rule written as code that <em>refuses to run</em> is not advice. So eight of the twelve principles were rewritten as gates. Every one below raises an error and stops. None of them warn.</p>
+  </div>
+
+  <section class="section">
+    <div class="section__head col">
+      <h2>The gates, under pressure</h2>
+      <p>Each block is a real attempt at something a person under deadline would plausibly do, and the engine's actual response — copied from the run, not paraphrased.</p>
+    </div>
+
+    <div class="gates">
+
+      <article class="gate">
+        <div class="gate__num">01</div>
+        <div class="gate__body">
+          <p class="eyebrow">P07 — Seal the goal first</p>
+          <h3>Start a session without a walk-away floor</h3>
+          <div class="exchange">
+            <div class="line"><span class="tag">attempt</span><span>objective with a target, but <code>floor=""</code></span></div>
+            <div class="line line--refused"><span class="tag">refused</span><span>sealed objective requires a floor: without one, any outcome clears the bar retroactively</span></div>
+          </div>
+          <p class="note">A goal stated after the outcome is known will always have been met. That is not dishonesty — it is how memory works, which is why it has to be stopped mechanically.</p>
+        </div>
+      </article>
+
+      <article class="gate">
+        <div class="gate__num">02</div>
+        <div class="gate__body">
+          <p class="eyebrow">P02 — Probe, don't binary</p>
+          <h3>Build a test suite that can only say no</h3>
+          <div class="exchange">
+            <div class="line"><span class="tag">attempt</span><span>a case pack whose every case should end in NO</span></div>
+            <div class="line line--refused"><span class="tag">refused</span><span>pack 'cautious-pack' never exercises BOUNDED, YES: it cannot separate judgment from disposition</span></div>
+          </div>
+          <p class="note">A suite built in the image of one disposition measures that disposition and reports it as rigor. Uncertainty is not an automatic no.</p>
+        </div>
+      </article>
+
+      <article class="gate">
+        <div class="gate__num">03</div>
+        <div class="gate__body">
+          <p class="eyebrow">P09 — Undetermined, not blank</p>
+          <h3>Leave the awkward dimension empty</h3>
+          <div class="exchange">
+            <div class="line"><span class="tag">attempt</span><span>a scorecard omitting calibration, which we have no data for</span></div>
+            <div class="line line--refused"><span class="tag">refused</span><span>silence is prohibited; score or declare UNDETERMINED for: calibration</span></div>
+            <div class="line"><span class="tag">attempt</span><span>the same scorecard, calibration marked UNDETERMINED</span></div>
+            <div class="line line--allowed"><span class="tag">allowed</span><span>scored, with 'calibration' recorded as unresolved</span></div>
+          </div>
+          <p class="note">A blank field reads as innocence to a human eye. Undetermined is a finding, and it has to say what is unresolved.</p>
+        </div>
+      </article>
+
+      <article class="gate">
+        <div class="gate__num">04</div>
+        <div class="gate__body">
+          <p class="eyebrow">Evaluation doctrine — no premature collapse</p>
+          <h3>Ask for one headline number</h3>
+          <div class="exchange">
+            <div class="line"><span class="tag">attempt</span><span><code>aggregate()</code> across the eight bands</span></div>
+            <div class="line line--refused"><span class="tag">refused</span><span>dimensions cannot be collapsed into one number before semantics and calibration are established</span></div>
+            <div class="line"><span class="tag">attempt</span><span>the same call, with calibration attested against reference runs</span></div>
+            <div class="line line--allowed"><span class="tag">allowed</span><span>aggregate = 80 — the UNDETERMINED dimension excluded, never zeroed</span></div>
+          </div>
+          <p class="note">Eight uncalibrated scales averaged together produce a number with no referent, which will nonetheless get quoted as though it had one. Scoring honesty as zero would punish it, so it is left out instead.</p>
+        </div>
+      </article>
+
+      <article class="gate">
+        <div class="gate__num">05</div>
+        <div class="gate__body">
+          <p class="eyebrow">P08 — Blind the roles</p>
+          <h3>Score a run where the wall was crossed</h3>
+          <div class="exchange">
+            <div class="line"><span class="tag">attempt</span><span>read the result of a run the objective-holder watched live</span></div>
+            <div class="line line--refused"><span class="tag">returned</span><span>NO_SCORE — deliberately not 0</span></div>
+            <div class="line"><span class="tag">attempt</span><span>force the scorecard out of it anyway</span></div>
+            <div class="line line--refused"><span class="tag">refused</span><span>run 'run-001' is not a measurement: objective holder watched the exchange live; the wall was open</span></div>
+          </div>
+          <p class="note">Zero is a measurement. This is the absence of one, and the two must not be averageable together.</p>
+        </div>
+      </article>
+
+      <article class="gate">
+        <div class="gate__num">06</div>
+        <div class="gate__body">
+          <p class="eyebrow">Evaluation doctrine — no self-validation</p>
+          <h3>Grade our own protocol</h3>
+          <div class="exchange">
+            <div class="line"><span class="tag">attempt</span><span>subject 'doctrine-v1' graded by 'doctrine-v1'</span></div>
+            <div class="line line--refused"><span class="tag">refused</span><span>'doctrine-v1' graded its own output. Usable for debugging, not as independent validation.</span></div>
+          </div>
+          <p class="note">The distinction erodes the moment it is left to a reader to notice.</p>
+        </div>
+      </article>
+
+      <article class="gate">
+        <div class="gate__num">07</div>
+        <div class="gate__body">
+          <p class="eyebrow">P10 — Add, never overwrite</p>
+          <h3>Quietly fix a published number</h3>
+          <div class="exchange">
+            <div class="line"><span class="tag">attempt</span><span>edit the published band=100 in place</span></div>
+            <div class="line line--refused"><span class="tag">refused</span><span>Ledger has no update() and no delete() to call — the methods do not exist</span></div>
+            <div class="line"><span class="tag">attempt</span><span>withdraw it publicly, then republish the identical figure</span></div>
+            <div class="line line--refused"><span class="tag">refused</span><span>this content was withdrawn as 55e12add2ec8… and cannot be republished</span></div>
+            <div class="line"><span class="tag">attempt</span><span>publish the corrected figure as new content</span></div>
+            <div class="line line--allowed"><span class="tag">allowed</span><span>3 entries, 1 standing — the original still readable, marked withdrawn</span></div>
+          </div>
+          <p class="note">The record grows; it never gets rewritten. Publishing the retraction is usually worth more than the figure was.</p>
+        </div>
+      </article>
+
+      <article class="gate">
+        <div class="gate__num">08</div>
+        <div class="gate__body">
+          <p class="eyebrow">P11 — Be dispensable</p>
+          <h3>Improve the record after publishing</h3>
+          <div class="exchange">
+            <div class="line"><span class="tag">attempt</span><span>change the withdrawn 100 to a 61, so the history reads cleaner</span></div>
+            <div class="line line--refused"><span class="tag">refused</span><span>entry 0 link mismatch</span></div>
+          </div>
+
+          <div class="hashes">
+            <div class="hash-row">
+              <span class="tag">recorded</span>
+              <span><span class="match">a</span><span class="differ">9afc754f96d3c1c881e4d04dcf4e17eb…</span></span>
+            </div>
+            <div class="hash-row">
+              <span class="tag">recomputed</span>
+              <span><span class="match">a</span><span class="differ">0c5736845e95b16055626cab8ddfb5d8…</span></span>
+            </div>
+          </div>
+          <p class="note">One digit changed in the body, and the fingerprint diverges from the second character onward. A second implementation, written in another language against the prose spec alone, catches this independently.</p>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section__head col">
+      <h2>Why it is written twice</h2>
+      <p>Publishing a hash and asking for belief is theater. The recipe for turning a record into its fingerprint is written out in plain words, and then implemented twice — once in Python, once in JavaScript — sharing no code. Both answer to the prose, not to each other.</p>
+    </div>
+    <div class="col">
+      <p>Run both against the same record. They arrive at the same fingerprint independently, and both catch an edited score and a deleted entry.</p>
+      <pre><span class="cmt"># the independent implementation — no dependencies</span>
+node verify/verify.mjs ledger.json
+
+<span class="cmt"># ours</span>
+python3 -m tactik_eval.verify ledger.json</pre>
+      <p class="note">Two implementations that agree is evidence. One implementation run twice is not. If they ever disagree, that is a finding about us, and should be reported as one.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section__head col">
+      <h2>Putting it into Claude</h2>
+      <p>Two skills ship with the repository. Both route their scorecards through the gates above, so the same refusals apply to the reviewer.</p>
+    </div>
+
+    <div class="skills col">
+      <div class="skill">
+        <code>/doctrine-review</code>
+        <p>Hand it an analysis, memo, forecast or debrief. It audits the reasoning against the twelve principles and scores eight dimensions — and cannot hand back a single grade or leave a dimension blank, because the code refuses both.</p>
+      </div>
+      <div class="skill">
+        <code>/sealed-run</code>
+        <p>Seals an objective before work starts, records who could see what, scores the run, and appends to a ledger a reviewer can check without you.</p>
+      </div>
+    </div>
+
+    <div class="paths">
+      <div class="path">
+        <h3>Inside this repository</h3>
+        <p>Nothing to install. Open Claude Code in the repo and type the skill name. Project skills load automatically for anyone who clones it — so a reviewer gets the same rules you have.</p>
+        <pre>/doctrine-review</pre>
+      </div>
+      <div class="path">
+        <h3>Everywhere else</h3>
+        <p>Install the plugin once, then the skills follow you into any project, namespaced under the plugin.</p>
+        <pre>/plugin marketplace add \
+  smaspons65-ship-it/tactik-center-client
+
+/plugin install santiago-doctrine@tactik</pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section__head col">
+      <h2>What this does not establish</h2>
+    </div>
+    <div class="col">
+      <div class="admits">
+        <h3>Predictive validity is still the load-bearing assumption</h3>
+        <p>Sealing, blinding and hashing show that a result was not edited and not steered. They say nothing about whether a counterparty reconstructed from institutional DNA behaves closely enough to the real one to change the real outcome.</p>
+        <p>Only pre-registered predictions, scored after real events, with the failures published beside the hits, can settle that. Nothing in this repository should be cited as evidence for it.</p>
+      </div>
+      <p class="note">Stated here rather than buried, because the doctrine says radical honesty is one of the rules — and because a verified record that implies more than it shows is exactly the flattery all of this is built against.</p>
+    </div>
+  </section>
+
+  <footer>
+    Santiago Maspons · TACTIK · Doctrine 1.0.0<br>
+    Every refusal above happened with nobody watching.
+  </footer>
+
+</div>
