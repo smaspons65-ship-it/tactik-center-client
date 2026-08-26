@@ -51,6 +51,49 @@ is minor units, and anything else is a decimal string parsed after verification.
 Scoring honesty as zero would punish it, and the rule would be abandoned within
 a quarter.
 
+## Using it in Claude
+
+Two skills ship with this repository.
+
+**`/doctrine-review`** — hand it an analysis, memo, forecast or debrief and it
+audits the reasoning against the twelve principles, then scores eight
+dimensions. It cannot hand back a single grade, and it cannot leave a dimension
+blank, because it routes its scorecard through `tactik_eval` and the code
+refuses both.
+
+**`/sealed-run`** — seals an objective before work starts, records who could
+see what, scores the run, and appends the result to a tamper-evident ledger a
+reviewer can check without you.
+
+### The zero-install way (this repo only)
+
+Nothing to do. Open Claude Code in this repository and type `/doctrine-review`.
+Project skills in `.claude/skills/` load automatically for anyone who clones
+it — which is the point: a reviewer gets the same rules you have.
+
+### Everywhere else
+
+To use the skills outside this repo, install the plugin:
+
+```
+/plugin marketplace add smaspons65-ship-it/tactik-center-client
+/plugin install santiago-doctrine@tactik
+```
+
+Then the skills are namespaced: `/santiago-doctrine:doctrine-review`.
+
+To try changes before publishing them, load the plugin from disk instead —
+`claude --plugin-dir .` from the repo root, then `/reload-plugins` after edits.
+
+### Watch the gates fire
+
+```bash
+python3 examples/demo_gates.py
+```
+
+Eight attempts at the convenient thing, and what the engine says back. This is
+the demo to run in front of a skeptic.
+
 ## Use
 
 ```bash
@@ -79,7 +122,16 @@ tactik_eval/
 verify/verify.mjs   second implementation, Node, no dependencies
 docs/HASHING.md     the recipe both implementations answer to
 doctrine/           the source documents the gates cite
+
+.claude/skills/     doctrine-review, sealed-run — auto-load in this repo
+skills/             the same two skills, as served by the plugin
+.claude-plugin/     plugin manifest and marketplace entry
 ```
+
+The skills are duplicated on purpose: `.claude/skills/` needs no installation
+inside this repo, and `skills/` is what the plugin serves elsewhere. A test
+asserts the two copies stay byte-identical, so they cannot drift into two
+different sets of rules.
 
 ## What this does not establish
 
