@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tactik-eval"
+version = "0.1.0"
+description = "Frozen-evaluation substrate for the Santiago Doctrine"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "UNLICENSED" }
+authors = [{ name = "TACTIK" }]
+
+# No runtime dependencies, deliberately. A reviewer who distrusts us should not
+# have to install anything of ours, or trust anything of anyone else's, to
+# check our arithmetic (Doctrine P11).
+dependencies = []
+
+[project.scripts]
+tactik-verify = "tactik_eval.verify:console_main"
+
+[tool.setuptools]
+packages = ["tactik_eval"]

@@ -1,0 +1,17 @@
+{
+  "version": "1.0",
+  "marketplace": {
+    "name": "tactik",
+    "description": "TACTIK internal tooling"
+  },
+  "plugins": [
+    {
+      "name": "santiago-doctrine",
+      "displayName": "Santiago Doctrine",
+      "version": "0.1.0",
+      "description": "Epistemic governance for high-stakes reasoning: doctrine review and sealed, verifiable evaluation runs.",
+      "source": "github",
+      "repo": "smaspons65-ship-it/tactik-center-client"
+    }
+  ]
+}

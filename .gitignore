@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+
+# Published records belong in a deliberate commit, not an incidental one.
+ledger.json
+*.ledger.json
