@@ -53,7 +53,16 @@ a quarter.
 
 ## Using it in Claude
 
-Two skills ship with this repository.
+Three skills ship with this repository, plus a standing floor that needs no
+invocation at all.
+
+**`/santiago`** — the reasoning posture, applied while the work happens rather
+than audited afterwards. Marks what is evidence versus deduction versus
+hypothesis versus unknown, keeps confidence matched to the basis in both
+directions, seals the objective before the conversation can rewrite it, and
+closes with what the answer does not establish. It scales with stakes on
+purpose: a doctrine applied everywhere at full weight gets switched off within a
+week, and then it governs nothing.
 
 **`/doctrine-review`** — hand it an analysis, memo, forecast or debrief and it
 audits the reasoning against the twelve principles, then scores eight
@@ -64,6 +73,13 @@ refuses both.
 **`/sealed-run`** — seals an objective before work starts, records who could
 see what, scores the run, and appends the result to a tamper-evident ledger a
 reviewer can check without you.
+
+**`CLAUDE.md`** carries the cheap half — authority matched to basis, undetermined
+stated rather than left blank, no collapsed verdicts — and is always in context
+inside this repository without anyone asking for it. Skills load when their
+description matches what you are doing; a floor that must hold on every answer
+belongs there instead. To carry the same floor outside this repo, copy its
+standing-floor section into `~/.claude/CLAUDE.md`.
 
 ### The zero-install way (this repo only)
 
@@ -123,14 +139,16 @@ verify/verify.mjs   second implementation, Node, no dependencies
 docs/HASHING.md     the recipe both implementations answer to
 doctrine/           the source documents the gates cite
 
-.claude/skills/     doctrine-review, sealed-run — auto-load in this repo
-skills/             the same two skills, as served by the plugin
+.claude/skills/     santiago, doctrine-review, sealed-run — auto-load here
+skills/             the same three skills, as served by the plugin
 .claude-plugin/     plugin manifest and marketplace entry
+CLAUDE.md           the standing floor, always in context in this repo
+analisis/           the doctrine's own reasoning examined (Spanish)
 ```
 
 The skills are duplicated on purpose: `.claude/skills/` needs no installation
 inside this repo, and `skills/` is what the plugin serves elsewhere. A test
-asserts the two copies stay byte-identical, so they cannot drift into two
+asserts the copies stay byte-identical, so they cannot drift into two
 different sets of rules.
 
 ## What this does not establish
