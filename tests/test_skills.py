@@ -18,7 +18,7 @@ PLUGIN_SKILLS = REPO_ROOT / "skills"
 PLUGIN_MANIFEST = REPO_ROOT / ".claude-plugin" / "plugin.json"
 MARKETPLACE = REPO_ROOT / ".claude-plugin" / "marketplace.json"
 
-EXPECTED_SKILLS = {"doctrine-review", "sealed-run"}
+EXPECTED_SKILLS = {"doctrine-review", "sealed-run", "santiago"}
 
 
 def parse_frontmatter(text: str) -> dict[str, str]:

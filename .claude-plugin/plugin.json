@@ -2,8 +2,8 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "santiago-doctrine",
   "displayName": "Santiago Doctrine",
-  "version": "0.1.0",
-  "description": "Epistemic governance for high-stakes reasoning. Audits analysis against the twelve principles, and runs sealed, blinded, tamper-evident evaluations whose results an outside reviewer can verify without you.",
+  "version": "0.2.0",
+  "description": "Epistemic governance for high-stakes reasoning. Governs how an answer is reasoned and stated, audits analysis against the twelve principles, and runs sealed, blinded, tamper-evident evaluations whose results an outside reviewer can verify without you.",
   "author": {
     "name": "TACTIK"
   },
