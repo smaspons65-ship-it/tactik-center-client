@@ -78,8 +78,20 @@ reviewer can check without you.
 stated rather than left blank, no collapsed verdicts — and is always in context
 inside this repository without anyone asking for it. Skills load when their
 description matches what you are doing; a floor that must hold on every answer
-belongs there instead. To carry the same floor outside this repo, copy its
-standing-floor section into `~/.claude/CLAUDE.md`.
+belongs there instead.
+
+To carry the same floor outside this repo:
+
+```bash
+bash instalar/instalar.sh              # installs it at user level
+bash instalar/instalar.sh --mostrar    # prints it, to paste where there is no filesystem
+```
+
+It extracts the floor from `CLAUDE.md` rather than carrying a copy, so the two
+cannot drift into two different sets of rules. It never overwrites: an existing
+`~/.claude/CLAUDE.md` is backed up and appended to, running it twice replaces its
+own marked block, and uninstalling means deleting that block. Plain-Spanish
+walkthrough for all three surfaces in `instalar/INSTRUCCIONES.md`.
 
 ### The zero-install way (this repo only)
 
@@ -143,6 +155,7 @@ doctrine/           the source documents the gates cite
 skills/             the same three skills, as served by the plugin
 .claude-plugin/     plugin manifest and marketplace entry
 CLAUDE.md           the standing floor, always in context in this repo
+instalar/           one-command install of that floor elsewhere (Spanish)
 analisis/           the doctrine's own reasoning examined (Spanish)
 ```
 
