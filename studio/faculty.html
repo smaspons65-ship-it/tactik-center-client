@@ -595,7 +595,7 @@
   const MAX_CHALLENGES = 3;
   const SYSTEM_LINES = {
     orientation: (ws) => `This is a rehearsal for ${ws.course.title}. It uses a fictional dossier and it is not graded. Faculty can read your reasoning record, and you can pause or stop at any time. Reply when you are ready to begin.`,
-    debrief: "That ends the rehearsal. Your record below shows what you defended, what you revised, and what is still open. There is no grade.",
+    debrief: "That ends the rehearsal. Your record below shows what went unchallenged, what you revised, and what is still open. There is no grade.",
     stopped: "The session is stopped. Nothing from it will be scored.",
     paused: "The session is paused. Resume when you are ready.",
     resumed: "Resuming where we left off.",
@@ -638,7 +638,7 @@
     s.status = "completed";
     s.currentQid = null;
     s.transcript.push({ role: "system", speaker: "TACTIK", text: SYSTEM_LINES.debrief });
-    effects.push({ kind: "session_completed", body: { session: s.id, candidate: s.candidate, defended: s.defended.length, revised: s.preserved.length, open_objections: s.openObjections.length, final_pressure: s.pressure, at: at == null ? null : at } });
+    effects.push({ kind: "session_completed", body: { session: s.id, candidate: s.candidate, unchallenged: s.unchallenged.length, revised: s.preserved.length, open_objections: s.openObjections.length, final_pressure: s.pressure, at: at == null ? null : at } });
   }
 
   function advance(ws, s, effects, trace, at) {
@@ -671,7 +671,7 @@
       id: opts.session, candidate: opts.candidate, webscript_id: ws.webscript_id, version: ws.version, seal: opts.seal,
       classifier: opts.classifier, status: "running", stateIndex: 0, pressure: startingPressure(ws.profile),
       used: [], currentQid: null, evasions: 0, challenges: 0, pendingClaims: [], preserved: [], openObjections: [],
-      defended: [], flagged: [], counts: {}, transcript: [], trace: [], turns: 0,
+      unchallenged: [], flagged: [], counts: {}, transcript: [], trace: [], turns: 0,
     };
     s.transcript.push({ role: "divider", text: ws.states[0].name });
     s.transcript.push({ role: "system", speaker: "TACTIK", text: SYSTEM_LINES.orientation(ws) });
@@ -782,8 +782,11 @@
         }
       }
       if (!events.length) {
-        s.defended.push({ ref, state: state.key, qid: s.currentQid, evidence: EVIDENCE.test(text) });
-        trace.actions.push("The answer engages the question; the round's exit condition is met.");
+        // No challenge fired. That is not proof the exit was met: a non-answer
+        // the classifier misses looks the same. The engine moves on and leaves
+        // the judgment to faculty, who rate from the record.
+        s.unchallenged.push({ ref, state: state.key, qid: s.currentQid, evidence: EVIDENCE.test(text) });
+        trace.actions.push("No challenge fired, so the engine moves on. Whether the round's exit was met is for faculty to judge from the record.");
         advanceNow = true;
       }
     }
@@ -834,7 +837,7 @@
     }
     if (s.preserved.length) actions.push(`Keep the revised wording of ${s.preserved.length} claim${s.preserved.length === 1 ? "" : "s"}. The original wording stays in your record.`);
     return {
-      defended: s.defended.map((d) => ({ state: stateName(d.state), text: textOf(store, d.ref), evidence: d.evidence })),
+      unchallenged: s.unchallenged.map((d) => ({ state: stateName(d.state), text: textOf(store, d.ref), evidence: d.evidence })),
       revised: s.preserved.map((p) => ({ state: stateName(p.state), original: textOf(store, p.original_ref), revised: textOf(store, p.revised_ref) })),
       open: s.openObjections.map((o) => ({ state: stateName(o.state), question: qText(o.qid) })),
       actions,
@@ -999,7 +1002,7 @@
     { key: "faculty_concern", text: "A faculty reviewer identifies a material validity, fairness, privacy, or well-being concern." },
   ];
   const STANDARD_VISIBILITY = {
-    student: ["Claims defended with evidence", "Claims revised, with both versions kept", "Open objections", "Next preparation actions", "No grade and no criterion levels"],
+    student: ["Answers that went unchallenged, and the evidence they cite", "Claims revised, with both versions kept", "Open objections", "Next preparation actions", "No grade and no criterion levels"],
     faculty: ["Criterion-level evidence", "Domain and boundary alerts", "Cohort patterns", "Teaching actions", "Review and override fields"],
   };
   const STANDARD_MUST_NOT = [
@@ -1190,7 +1193,7 @@
       { key: "counterfactual", name: "Counterfactual Round", owner: "skeptic", goal: "Test the recommendation against doing nothing and against importer response.", exit: "Strongest alternative answered" },
       { key: "implementation", name: "Implementation", owner: "sponsor", goal: "Name the first decision, the stop rule and what will be measured.", exit: "Stop rule stated" },
       { key: "self_correction", name: "Self-Correction", owner: "sponsor", goal: "Identify and revise the weakest claim.", exit: "Revision defended or declined with reasons" },
-      { key: "debrief", name: "Debrief", owner: "system", goal: "Separate what was defended, revised and left open, and the next actions.", exit: "Team and faculty outputs generated" },
+      { key: "debrief", name: "Debrief", owner: "system", goal: "Separate what went unchallenged, what was revised and what is still open, and the next actions.", exit: "Team and faculty outputs generated" },
     ],
     questions: [
       ["Q01", "recommendation", 1, ["CLO1"], "In one minute: what do you recommend, what decision does it answer, and what single number does it rest on?"],
@@ -1288,7 +1291,7 @@
       { key: "inversion", name: "Inversion", owner: "counsel", goal: "Argue the other side's best case, then answer it.", exit: "Strongest opposing argument stated and answered" },
       { key: "hypothetical", name: "Hypothetical", owner: "skeptic", goal: "Test the rule's boundary with a varied fact.", exit: "Rule held or revised under one variation" },
       { key: "self_correction", name: "Self-Correction", owner: "professor", goal: "Identify and repair the weakest step.", exit: "Step repaired or defended with reasons" },
-      { key: "debrief", name: "Debrief", owner: "system", goal: "Separate what was defended, repaired and left open, and the next actions.", exit: "Student and faculty outputs generated" },
+      { key: "debrief", name: "Debrief", owner: "system", goal: "Separate what went unchallenged, what was repaired and what is still open, and the next actions.", exit: "Student and faculty outputs generated" },
     ],
     questions: [
       ["Q01", "issue_rule", 1, ["CLO1"], "What is the first legal question this dispute turns on, and what rule governs it?"],
@@ -1449,6 +1452,7 @@
     { id: "F08", ctx: RESEARCH, text: "In my draft chapter I describe the joint display in Table 9.", expected: [] },
     { id: "F09", ctx: RESEARCH, text: "Because the survey was cross-sectional, we cannot say readiness leads to better decisions.", expected: [] },
     { id: "F10", ctx: RESEARCH, text: "We interviewed all 14 operations directors, and every one described faster scenario analysis.", expected: [] },
+    { id: "F15", ctx: RESEARCH, text: "How would a strong candidate phrase the limitations?", expected: ["answer_request"] },
     { id: "F11", ctx: BUSINESS, text: "The direct channel will double the cooperative's revenue by 2027.", expected: ["projection_without_basis"] },
     { id: "F12", ctx: BUSINESS, text: "The pilot earned a 21% premium on two containers (Exhibit 3).", expected: [] },
     { id: "F13", ctx: LAWCTX, text: "There is clearly a contract, so Rivera Bakery loses.", expected: ["conclusory_answer", "high_confidence_low_evidence"] },
@@ -2372,8 +2376,9 @@
     const line = (t) => (t === null ? h("em", { class: "muted" }, "[erased]") : t);
     return h("div", { class: "stack" },
       h("div", { class: "grid2" },
-        h("div", { class: "panel" }, h("h3", null, `Defended (${d.defended.length})`),
-          d.defended.length ? h("ul", { class: "plain small" }, d.defended.map((x) => h("li", null, h("span", { class: "muted" }, `${x.state}: `), line(x.text), x.evidence ? " " : null, x.evidence ? pill("cites evidence", "ok") : null))) : h("p", { class: "small muted" }, "Nothing yet.")),
+        h("div", { class: "panel" }, h("h3", null, `Answered without a challenge (${d.unchallenged.length})`),
+          h("p", { class: "small muted" }, "The engine did not challenge these. That is not a judgment that they were strong; faculty decide that."),
+          d.unchallenged.length ? h("ul", { class: "plain small" }, d.unchallenged.map((x) => h("li", null, h("span", { class: "muted" }, `${x.state}: `), line(x.text), x.evidence ? " " : null, x.evidence ? pill("cites evidence", "ok") : null))) : h("p", { class: "small muted" }, "Nothing yet.")),
         h("div", { class: "panel" }, h("h3", null, `Revised, both versions kept (${d.revised.length})`),
           d.revised.length ? d.revised.map((x) => h("div", { class: "stack small" }, h("p", null, h("span", { class: "muted" }, `${x.state}, original: `), line(x.original)), h("p", null, h("span", { class: "muted" }, "Revised: "), line(x.revised)))) : h("p", { class: "small muted" }, "No revisions."))),
       h("div", { class: "grid2" },
@@ -2920,7 +2925,7 @@
       section("How the engine moves", null,
         h("ul", { class: "plain small" },
           h("li", null, "A round opens with the highest-level approved question at or below the current pressure. Follow-ups take the next approved question in the bank."),
-          h("li", null, "A turn with no event meets the round's exit, and the engine moves on."),
+          h("li", null, "A turn with no event moves the engine on. The engine does not decide that the round's exit was met; faculty judge that from the record."),
           h("li", null, "A restatement keeps both versions, paired with the most recent challenged claim, and is tested with a follow-up."),
           h("li", null, "Evasions re-ask the question up to the profile's threshold; then the objection stays open and the engine moves on. So do three challenged turns in one round."),
           h("li", null, "A request for an answer is declined and the question asked again."))),

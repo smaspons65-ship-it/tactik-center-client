@@ -108,7 +108,7 @@ how that sentence survives a deadline.
 
 ## Teaching profile, and what each field changes
 
-Every field changes behavior, and the studio shows which:
+Every field except `format` changes behavior, and the studio says which:
 
 - `challenge_intensity`: the starting pressure level. 0–33 starts at level 1,
   34–66 at level 2, 67–100 at level 3.
@@ -135,7 +135,10 @@ prompt, or one of the engine's fixed system lines.
   Claude returns event names only. Anything that is not an event this script
   defines is discarded, and Claude's text is never shown to the candidate. If
   Claude is unavailable, the rules classify that turn and the trace says so.
-- **A turn with no event** meets the state's exit, and the engine moves on.
+- **A turn with no event** moves the engine to the next state. The engine does
+  not claim the state's exit was met: a non-answer the classifier misses looks
+  the same, so the debrief lists such turns as answered without a challenge and
+  faculty judge them from the record.
   **A self-correction** keeps both versions, pairing the restatement with the
   most recent challenged claim, then tests the revision with a follow-up.
   **Evasions** up to the profile's threshold re-ask the question; at the
@@ -144,8 +147,9 @@ prompt, or one of the engine's fixed system lines.
   objection open and move on. **A request for an answer** is declined and the
   question re-asked. When a turn both restates a claim and contains domain
   wording (causal, projection, conclusory), the restatement rule wins.
-- **The debrief** lists what was defended, what was revised (both versions),
-  what is still open, and next preparation actions. It contains no grade.
+- **The debrief** lists what went unchallenged, what was revised (both
+  versions), what is still open, and next preparation actions. It contains no
+  grade.
 
 ## Ledger entries the studio writes
 

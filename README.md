@@ -188,8 +188,9 @@ reasoning ledger, faculty action.
   Claude through the artifact `sample` capability. Claude returns labels only.
   Everything the candidate reads is an approved question, an approved prompt, or
   a fixed system line, and a test holds the engine to that against a hostile
-  classifier. The debrief lists what was defended, what was revised (both
-  versions), what is open, and next actions. There is no grade.
+  classifier. The debrief lists what went unchallenged, what was revised (both
+  versions), what is open, and next actions. There is no grade, and the engine
+  never claims an answer was good: faculty judge that from the record.
 - **Trigger lab**: rules and Claude side by side on fixtures and on style pairs
   that test the p.3 fairness boundary. The rules breach it on two of four pairs.
 - **Readiness**: faculty rate each criterion from the reasoning record. The
