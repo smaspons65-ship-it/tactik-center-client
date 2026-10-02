@@ -5,17 +5,19 @@ substrate for the Santiago Doctrine: stdlib only, zero dependencies, Python
 ≥ 3.10.
 
 ```bash
-python3 -m unittest discover -s tests    # 112 tests, must stay green
+python3 -m unittest discover -s tests    # 123 tests, must stay green
 python3 examples/demo_gates.py           # the eight refusals
 node verify/verify.mjs ledger.json       # the independent implementation
 python3 -m tactik_eval.edu webscript.json  # a Faculty Studio export: seal + lock gates
 ```
 
 `studio/faculty.html` is the TACTIK EDU Faculty Studio: one self-contained page,
-no build, no network beyond fonts, fictional data only. Its core script is a
-second implementation of `docs/WEBSCRIPT.md` and `docs/HASHING.md`, and
-`tests/test_studio.py` runs it under Node against `tactik_eval.edu`. Change one
-side and the other must follow, or the suite fails.
+no build, fictional data only. It carries three course packs, syllabus import,
+and the live rehearsal engine. Its only AI path is the opt-in `sample` capability
+(Claude labels turns; its words never reach a candidate), and a test holds it
+to that. Its core script is a second implementation of `docs/WEBSCRIPT.md` and
+`docs/HASHING.md`; `tests/test_studio.py` runs it under Node against
+`tactik_eval.edu`. Change one side and the other must follow, or the suite fails.
 
 ## The standing floor
 

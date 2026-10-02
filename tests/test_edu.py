@@ -65,9 +65,13 @@ def complete_payload() -> dict:
                 "text": "Why this design?",
                 "status": "APPROVED",
                 "approved_by": "Faculty owner",
+                "outcomes": ["CLO1"],
             }
         ],
-        "event_rules": [{"event": e, "response": "respond"} for e in MANDATORY_EVENTS],
+        "event_rules": [
+            {"event": e, "response": "respond", "prompt": "say this", "lens": None}
+            for e in MANDATORY_EVENTS
+        ],
         "stop_conditions": [{"key": k, "text": "stop"} for k in MANDATORY_STOPS],
         "visibility": {"student": ["claims"], "faculty": ["criteria"]},
         "rubric": {
@@ -131,6 +135,23 @@ class TestWebscriptLock(unittest.TestCase):
         ]
         self.assertEqual(codes(payload), ["STOP_CONDITION_MISSING"])
 
+    def test_a_rule_without_candidate_wording_blocks_the_lock(self) -> None:
+        payload = complete_payload()
+        payload["event_rules"][0]["prompt"] = "  "
+        self.assertEqual(codes(payload), ["EVENT_RULE_MISSING"])
+
+    def test_a_rule_spoken_by_an_unknown_lens_blocks_the_lock(self) -> None:
+        payload = complete_payload()
+        payload["event_rules"].append(
+            {"event": "causal_language", "response": "r", "prompt": "p", "lens": "methodologist"}
+        )
+        self.assertEqual(codes(payload), ["EVENT_LENS_UNKNOWN"])
+
+    def test_an_empty_dossier_blocks_the_lock(self) -> None:
+        payload = complete_payload()
+        payload["dossier"]["facts"] = ["", "  "]
+        self.assertEqual(codes(payload), ["DOSSIER_EMPTY"])
+
     def test_faculty_may_add_a_stop_condition(self) -> None:
         payload = complete_payload()
         payload["stop_conditions"].append({"key": "faculty_6", "text": "candidate is distressed"})
@@ -186,6 +207,18 @@ class TestWebscriptLock(unittest.TestCase):
         webscript = load_webscript(complete_payload())
         reloaded = load_webscript(json.loads(json.dumps(webscript.to_payload())))
         self.assertEqual(webscript.seal, reloaded.seal)
+
+    def test_a_field_outside_the_format_is_refused_not_dropped(self) -> None:
+        """A dropped field would leave the seal not covering what was exported."""
+        for path in (("operator_note",), ("objective", "override"), ("rubric", "composite_formula")):
+            with self.subTest(path=path):
+                payload = complete_payload()
+                target = payload
+                for key in path[:-1]:
+                    target = target[key]
+                target[path[-1]] = "hidden"
+                with self.assertRaises(ValueError):
+                    load_webscript(payload)
 
     def test_unknown_question_status_is_malformed_not_a_blocker(self) -> None:
         payload = complete_payload()

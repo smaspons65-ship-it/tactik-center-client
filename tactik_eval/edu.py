@@ -21,7 +21,7 @@ import sys
 from dataclasses import dataclass, field
 from typing import Any, Mapping, Sequence
 
-from .canonical import digest
+from .canonical import canonical_bytes, digest
 from .casepack import SealedObjective
 from .rubric import UNDETERMINED, CalibrationAttestation, PrematureCollapse
 
@@ -233,10 +233,13 @@ class Question:
     text: str
     status: str
     approved_by: str | None
+    outcomes: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         if not self.qid.strip():
             raise ValueError("question requires an id")
+        for outcome in self.outcomes:
+            _require_text(f"{self.qid}.outcomes[]", outcome)
         _require_int(f"{self.qid}.pressure", self.pressure, 1, 3)
         if self.status not in QUESTION_STATUSES:
             raise ValueError(
@@ -255,16 +258,37 @@ class Question:
             "text": self.text,
             "status": self.status,
             "approved_by": self.approved_by,
+            "outcomes": list(self.outcomes),
         }
 
 
 @dataclass(frozen=True)
 class EventRule:
+    """What the engine does on an event, and the words the candidate sees.
+
+    `response` is the instruction faculty approve. `prompt` is the exact text
+    shown to the candidate: the engine never composes its own. `lens` names
+    who speaks, or None for whoever owns the current state.
+    """
+
     event: str
     response: str
+    prompt: str
+    lens: str | None = None
+
+    def __post_init__(self) -> None:
+        _require_text(f"{self.event}.response", self.response)
+        _require_text(f"{self.event}.prompt", self.prompt)
+        if self.lens is not None:
+            _require_text(f"{self.event}.lens", self.lens)
 
     def to_payload(self) -> dict[str, Any]:
-        return {"event": self.event, "response": self.response}
+        return {
+            "event": self.event,
+            "response": self.response,
+            "prompt": self.prompt,
+            "lens": self.lens,
+        }
 
 
 @dataclass(frozen=True)
@@ -467,6 +491,16 @@ class Webscript:
         for gap in self.objective.gaps():
             blockers.append(("OBJECTIVE_INCOMPLETE", f"objective {gap} is blank"))
 
+        facts = self.dossier.get("facts") or ()
+        if not any(isinstance(f, str) and f.strip() for f in facts):
+            blockers.append(
+                (
+                    "DOSSIER_EMPTY",
+                    "the dossier has no facts; a rehearsal with no evidence "
+                    "pack cannot test evidence",
+                )
+            )
+
         lens_keys = {lens.key for lens in self.lenses}
         states = {s.key: s for s in self.states}
         if not self.states or self.states[0].owner != SYSTEM or self.states[-1].owner != SYSTEM:
@@ -480,7 +514,7 @@ class Webscript:
         for state in self.states:
             if state.owner != SYSTEM and state.owner not in lens_keys:
                 blockers.append(
-                    ("STATE_OWNER_UNKNOWN", f"{state.key} is owned by unknown {state.owner!r}")
+                    ("STATE_OWNER_UNKNOWN", f"{state.key} is owned by unknown '{state.owner}'")
                 )
             if not state.goal.strip() or not state.exit.strip():
                 blockers.append(
@@ -506,8 +540,8 @@ class Webscript:
                 blockers.append(
                     (
                         "QUESTION_MISPLACED",
-                        f"{question.qid}: lens {question.lens!r} does not own "
-                        f"state {question.state!r}",
+                        f"{question.qid}: lens '{question.lens}' does not own "
+                        f"state '{question.state}'",
                     )
                 )
         for state in self.states:
@@ -520,16 +554,22 @@ class Webscript:
                     ("STATE_WITHOUT_QUESTION", f"{state.key} has no approved question")
                 )
 
-        responses = {r.event: r.response for r in self.event_rules}
+        rules = {r.event: r for r in self.event_rules}
         for event in MANDATORY_EVENTS:
-            if not responses.get(event, "").strip():
-                blockers.append(("EVENT_RULE_MISSING", f"rule {event!r} is missing or blank"))
+            rule = rules.get(event)
+            if rule is None or not rule.response.strip() or not rule.prompt.strip():
+                blockers.append(("EVENT_RULE_MISSING", f"rule '{event}' is missing or blank"))
+        for rule in self.event_rules:
+            if rule.lens is not None and rule.lens not in lens_keys:
+                blockers.append(
+                    ("EVENT_LENS_UNKNOWN", f"rule '{rule.event}' names unknown lens '{rule.lens}'")
+                )
 
         stops = {s.key: s.text for s in self.stop_conditions}
         for key in MANDATORY_STOPS:
             if not stops.get(key, "").strip():
                 blockers.append(
-                    ("STOP_CONDITION_MISSING", f"stop condition {key!r} is missing or blank")
+                    ("STOP_CONDITION_MISSING", f"stop condition '{key}' is missing or blank")
                 )
 
         total = sum(c.weight_bp for c in self.rubric.criteria)
@@ -662,7 +702,44 @@ class ReadinessCard:
 
 
 def load_webscript(payload: Mapping[str, Any]) -> Webscript:
-    """Rebuild a Webscript from its canonical payload (inverse of `to_payload`)."""
+    """Rebuild a Webscript from its canonical payload (inverse of `to_payload`).
+
+    Strict: the rebuilt payload must be byte-identical in canonical form to
+    the one given. A field the format does not define would otherwise be
+    dropped on load and the seal recomputed without it, so an export carrying
+    extra content would report a seal that does not cover that content.
+    """
+    webscript = _build(payload)
+    if canonical_bytes(webscript.to_payload()) != canonical_bytes(payload):
+        raise ValueError(
+            "payload does not round-trip through the Webscript format: "
+            + "; ".join(_differences(payload, webscript.to_payload()))
+            + ". A seal computed after dropping fields would not cover them."
+        )
+    return webscript
+
+
+def _differences(given: Any, rebuilt: Any, path: str = "$") -> list[str]:
+    if isinstance(given, Mapping) and isinstance(rebuilt, Mapping):
+        found = [f"{path}.{k} is not part of the format" for k in given if k not in rebuilt]
+        found += [f"{path}.{k} is missing" for k in rebuilt if k not in given]
+        for key in given:
+            if key in rebuilt:
+                found += _differences(given[key], rebuilt[key], f"{path}.{key}")
+        return found
+    if isinstance(given, (list, tuple)) and isinstance(rebuilt, (list, tuple)):
+        if len(given) != len(rebuilt):
+            return [f"{path} has {len(given)} items, rebuilt {len(rebuilt)}"]
+        found: list[str] = []
+        for index, (a, b) in enumerate(zip(given, rebuilt)):
+            found += _differences(a, b, f"{path}[{index}]")
+        return found
+    if canonical_bytes(given) != canonical_bytes(rebuilt):
+        return [f"{path} changes on rebuild"]
+    return []
+
+
+def _build(payload: Mapping[str, Any]) -> Webscript:
     rubric = payload["rubric"]
     return Webscript(
         format=payload["format"],
@@ -679,7 +756,10 @@ def load_webscript(payload: Mapping[str, Any]) -> Webscript:
         lenses=tuple(Lens(**raw) for raw in payload["lenses"]),
         states=tuple(State(**raw) for raw in payload["states"]),
         pressure_levels=tuple(PressureLevel(**raw) for raw in payload["pressure_levels"]),
-        questions=tuple(Question(**raw) for raw in payload["questions"]),
+        questions=tuple(
+            Question(**{**raw, "outcomes": tuple(raw.get("outcomes", ()))})
+            for raw in payload["questions"]
+        ),
         event_rules=tuple(EventRule(**raw) for raw in payload["event_rules"]),
         stop_conditions=tuple(StopCondition(**raw) for raw in payload["stop_conditions"]),
         visibility={k: tuple(v) for k, v in payload["visibility"].items()},

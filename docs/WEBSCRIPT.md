@@ -19,16 +19,22 @@ format            "tactik-edu/webscript@1"
 webscript_id      string, non-empty
 version           integer ≥ 1
 supersedes        null, or the 64-hex seal of the locked version this replaces
-course            object of strings (code, title, institution)
+course            object of strings (code, title, institution, program, syllabus_seal);
+                  syllabus_seal is the digest of the syllabus the script was built from
 objective         {target, floor, must_not_happen: [string]}
-dossier           object (title, design, facts: [string]); design "cross-sectional"
-                  enables the causal-language trigger
+dossier           object (title, design, domain, facts: [string]); design
+                  "cross-sectional" enables the causal-language trigger, domain
+                  "business" the projection trigger, domain "law" the conclusory one
 lenses            [{key, name, job, primary_lens, boundary}]   key ≠ "system"
 states            [{key, name, owner, goal, exit}]   owner is "system" or a lens key
 pressure_levels   [{level: 1|2|3, definition}]
 questions         [{qid, state, lens, pressure: 1|2|3, text,
-                    status: "DRAFT"|"APPROVED", approved_by: string|null}]
-event_rules       [{event, response}]
+                    status: "DRAFT"|"APPROVED", approved_by: string|null,
+                    outcomes: [syllabus outcome ids]}]
+event_rules       [{event, response, prompt, lens: string|null}]
+                  response is the instruction faculty approve; prompt is the exact
+                  text the candidate sees; lens is who says it (null: the owner of
+                  the current state)
 stop_conditions   [{key, text}]
 visibility        {student: [string], faculty: [string]}
 rubric            {weight_use: "prioritization"|"composite",
@@ -38,6 +44,9 @@ profile           {challenge_intensity: 0..100, evidence_strictness: 0..100,
                    evasions_before_reframe: 1..3,
                    format: "cold_call"|"seminar"|"presentation"}
 ```
+
+A payload is loaded strictly: a field this format does not define is refused,
+never dropped, because a seal recomputed without it would not cover it.
 
 Weights are basis points: 15% is `1500`. Readiness levels are integers 0–3, one
 anchor each. Who locked the script and when are recorded in the ledger entry
@@ -51,31 +60,36 @@ implementations produce blockers with these codes, in this order:
 
 1. `OBJECTIVE_INCOMPLETE`, once per blank field among target, floor and
    must_not_happen. must_not_happen is blank when it has no non-blank clause.
-2. `STATES_UNBOUNDED`, once, if there are no states or the first or last state
+2. `DOSSIER_EMPTY`, once, if `dossier.facts` has no non-blank string. A
+   rehearsal with no evidence pack cannot test evidence.
+3. `STATES_UNBOUNDED`, once, if there are no states or the first or last state
    is not system-owned. Orientation and debrief bound the session; without them
    it can wander into open-ended tutoring (proposal p.8).
-3. Per state in order: `STATE_OWNER_UNKNOWN` if the owner is neither "system"
+4. Per state in order: `STATE_OWNER_UNKNOWN` if the owner is neither "system"
    nor a lens key, then `STATE_INCOMPLETE` if goal or exit is blank.
-4. `PRESSURE_UNDEFINED`, once per level 1, 2, 3 with no non-blank definition.
+5. `PRESSURE_UNDEFINED`, once per level 1, 2, 3 with no non-blank definition.
    The proposal names three levels and never defines them; that is faculty
    content.
-5. Per question in order: `QUESTION_PENDING` if DRAFT, or
+6. Per question in order: `QUESTION_PENDING` if DRAFT, or
    `QUESTION_UNATTRIBUTED` if APPROVED with a blank or null approver; then
    `QUESTION_MISPLACED` if its state does not exist, is system-owned, or is
    owned by a different lens.
-6. Per lens-owned state in order: `STATE_WITHOUT_QUESTION` if no APPROVED
+7. Per lens-owned state in order: `STATE_WITHOUT_QUESTION` if no APPROVED
    question belongs to it.
-7. Per mandatory event in order: `EVENT_RULE_MISSING` if absent or blank.
+8. Per mandatory event in order: `EVENT_RULE_MISSING` if absent, or if its
+   response or its prompt is blank.
    Mandatory events (proposal p.7): `unsupported_claim`,
    `high_confidence_low_evidence`, `self_correction`, `evasion_repeat`,
    `answer_request`.
-8. Per mandatory stop condition in order: `STOP_CONDITION_MISSING` if absent or
+9. Per rule in order: `EVENT_LENS_UNKNOWN` if its lens is not null and is
+   not a lens key.
+10. Per mandatory stop condition in order: `STOP_CONDITION_MISSING` if absent or
    blank. Mandatory stop conditions (proposal p.18):
    `participant_requests_stop`, `restricted_information`,
    `departs_from_approved_scope`, `generates_student_work`, `faculty_concern`.
-9. `RUBRIC_WEIGHTS`, once, unless every weight is positive and they total 10000.
-10. Per criterion in order: `RUBRIC_ANCHOR_BLANK` if any anchor is blank.
-11. `RUBRIC_PENDING`, once, unless the rubric is APPROVED by a named approver.
+11. `RUBRIC_WEIGHTS`, once, unless every weight is positive and they total 10000.
+12. Per criterion in order: `RUBRIC_ANCHOR_BLANK` if any anchor is blank.
+13. `RUBRIC_PENDING`, once, unless the rubric is APPROVED by a named approver.
 
 Faculty may reword any rule or condition and may add more. They may not remove
 a mandatory one. `answer_request` is the refusal to write the candidate's work;
@@ -105,19 +119,52 @@ Every field changes behavior, and the studio shows which:
 - `format`: recorded and sealed. The studio's preview does not yet change
   anything on it, and says so.
 
+## The engine
+
+A candidate rehearses only against a locked Webscript. The engine is a state
+machine over the script's states. It never writes what the candidate sees.
+Every line shown to a candidate is an approved question, an approved rule
+prompt, or one of the engine's fixed system lines.
+
+- **Opening question of a state**: the highest-level approved question at or
+  below the current pressure, ties in bank order; if none is that low, the
+  lowest-level approved question. **Follow-ups**: the next unused approved
+  question in bank order.
+- **Classification**: each candidate turn is labelled with events, either by
+  the disclosed rules in the page or, when the viewer turns it on, by Claude.
+  Claude returns event names only. Anything that is not an event this script
+  defines is discarded, and Claude's text is never shown to the candidate. If
+  Claude is unavailable, the rules classify that turn and the trace says so.
+- **A turn with no event** meets the state's exit, and the engine moves on.
+  **A self-correction** keeps both versions, pairing the restatement with the
+  most recent challenged claim, then tests the revision with a follow-up.
+  **Evasions** up to the profile's threshold re-ask the question; at the
+  threshold the question is reframed, the objection is recorded as open, and
+  the engine moves on. **Three challenged turns** in one state also leave the
+  objection open and move on. **A request for an answer** is declined and the
+  question re-asked. When a turn both restates a claim and contains domain
+  wording (causal, projection, conclusory), the restatement rule wins.
+- **The debrief** lists what was defended, what was revised (both versions),
+  what is still open, and next preparation actions. It contains no grade.
+
 ## Ledger entries the studio writes
 
 The studio appends to a `tactik_eval`-compatible ledger (`docs/HASHING.md`), so
 `node verify/verify.mjs` and `python3 -m tactik_eval.verify` both check it.
-Candidate text never enters an entry body. A body carries `content_ref`, the
-digest of `{"salt": <32 hex>, "text": <text>}`, and the text and salt live in a
-separate content store. Erasing them honors a deletion decision (proposal
+Candidate and rater text never enters an entry body. A body carries only
+references (`content_ref` for a candidate turn, `note_ref` for a rater's
+evidence note, `reason_ref` for an override's reason, `original_ref` and
+`revised_ref` for a preserved claim), each the digest of
+`{"salt": <32 hex>, "text": <text>}`. The text and salt live in a separate
+content store. Erasing them honors a deletion decision (proposal
 p.17). The chain still verifies, and the text cannot be recovered from the
 hash. The erasure is itself appended (`content_erased`).
 
-Kinds: `fixture_loaded`, `webscript_drafted`, `question_approved`,
-`question_rejected`, `rubric_approved`, `webscript_locked`, `trigger_reviewed`,
-`dry_run_reviewed`, `session_opened`, `session_events`, `observation_recorded`,
+Kinds: `fixture_loaded`, `syllabus_imported`, `webscript_drafted`,
+`question_approved`, `question_rejected`, `rubric_approved`, `webscript_locked`,
+`trigger_reviewed`, `classifier_compared`, `dry_run_reviewed`, `session_opened`,
+`session_events`, `turn_recorded`, `claim_preserved`, `objection_opened`,
+`pressure_raised`, `observation_recorded`,
 `observation_overridden`, `session_paused`, `session_resumed`,
 `session_completed`, `session_stopped`, `charter_event`, `teaching_action`,
 `content_erased`. An override never edits the observation it disagrees with: it

@@ -169,27 +169,32 @@ different sets of rules.
 
 ## TACTIK EDU: the Faculty Studio
 
-`studio/faculty.html` is the faculty side of the Westcliff pilot proposal
-(Aug 2026). It is the tool the proposal's days 11–25 describe: configure and
-version-lock the Webscript, test it on synthetic data, red-team it with faculty.
-Open the file in a browser. It needs no install and no server, and it calls no
-AI model.
+`studio/faculty.html` is the first running MVP of the Westcliff pilot proposal
+(Aug 2026). Open the file in a browser: no install, no server. It runs the whole
+loop the proposal draws on p.3: faculty standard, candidate rehearsal,
+reasoning ledger, faculty action.
 
-- **Webscript**: TACTIK drafts the DBA defense script from the proposal (three
-  lenses, seven states, twelve questions, six criteria). Faculty approve, edit
-  or reject each question, define the three pressure levels the proposal never
-  defined, approve the rubric, and lock. The lock refuses while anything is
-  unapproved, and the seal goes in the ledger.
-- **Trigger lab**: the rules that notice overclaims, evasions and requests for
-  answers, disclosed in full and run against fixtures. Style pairs test the
-  proposal's fairness boundary (p.3). Today the rules breach it on two of four
-  pairs. The studio shows that rather than hiding it.
-- **Dry run**: the seven-minute defense with a scripted fictional candidate.
-  Only approved questions are asked, and every teaching-profile setting changes
-  what happens.
-- **Readiness**: criterion-level evidence for a synthetic cohort, with
-  overrides that add entries and never edit, a refusal to combine criteria into
-  one score, and NO_SCORE for stopped sessions.
+- **Course**: three course packs in the shape of the programs the proposal
+  ranks: DBA 700 dissertation defense, MBA 690 strategy capstone, LAW 520
+  Contracts Socratic. The syllabi, dossiers and clients are fictional. Or paste
+  any syllabus: the studio reads outcomes, weeks and weights (decimal percents
+  become basis points, never floats) and drafts a Webscript for faculty.
+- **Webscript**: faculty approve, edit or reject every question, set the exact
+  words the candidate sees for every rule, define the three pressure levels,
+  approve the rubric, and lock. The lock refuses while anything is unfinished.
+- **Rehearse**: the engine. A candidate answers in their own words against a
+  locked script, across seven controlled states. Every turn is labelled with
+  events, by the disclosed rules in the page or, when the viewer turns it on, by
+  Claude through the artifact `sample` capability. Claude returns labels only.
+  Everything the candidate reads is an approved question, an approved prompt, or
+  a fixed system line, and a test holds the engine to that against a hostile
+  classifier. The debrief lists what was defended, what was revised (both
+  versions), what is open, and next actions. There is no grade.
+- **Trigger lab**: rules and Claude side by side on fixtures and on style pairs
+  that test the p.3 fairness boundary. The rules breach it on two of four pairs.
+- **Readiness**: faculty rate each criterion from the reasoning record. The
+  engine never rates anyone. Overrides add entries, a single score is refused,
+  and stopped sessions are NO_SCORE.
 - **Ledger**: `tactik_eval`'s format, so `verify/verify.mjs` and
   `python3 -m tactik_eval.verify` check the export. Candidate text stays out of
   entry bodies (salted hashes only), so it can be erased while the chain still
@@ -199,8 +204,8 @@ AI model.
 python3 -m tactik_eval.edu webscript.json   # recompute the seal, list blockers
 ```
 
-What it does not establish: that rehearsal helps, that the disclosed rules are
-adequate (they are not yet), or any compliance with FERPA or institutional
+What it does not establish: that rehearsal helps, that either classifier is
+adequate for real candidates, or any compliance with FERPA or institutional
 policy. Fictional data in one browser proves none of those.
 
 ## What this does not establish
