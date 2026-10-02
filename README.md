@@ -147,8 +147,11 @@ tactik_eval/
   protocol.py    run conditions, blinding attestation, void-on-contamination
   record.py      append-only hash-chained ledger with public withdrawal
   verify.py      python-side verifier CLI
+  edu.py         TACTIK EDU: Webscript lock gates, readiness card, CLI
 verify/verify.mjs   second implementation, Node, no dependencies
 docs/HASHING.md     the recipe both implementations answer to
+docs/WEBSCRIPT.md   the Webscript format and lock gates, same arrangement
+studio/faculty.html the Faculty Studio: the teachers' tool, browser-only
 doctrine/           the source documents the gates cite
 
 .claude/skills/     santiago, doctrine-review, sealed-run — auto-load here
@@ -163,6 +166,42 @@ The skills are duplicated on purpose: `.claude/skills/` needs no installation
 inside this repo, and `skills/` is what the plugin serves elsewhere. A test
 asserts the copies stay byte-identical, so they cannot drift into two
 different sets of rules.
+
+## TACTIK EDU: the Faculty Studio
+
+`studio/faculty.html` is the faculty side of the Westcliff pilot proposal
+(Aug 2026). It is the tool the proposal's days 11–25 describe: configure and
+version-lock the Webscript, test it on synthetic data, red-team it with faculty.
+Open the file in a browser. It needs no install and no server, and it calls no
+AI model.
+
+- **Webscript**: TACTIK drafts the DBA defense script from the proposal (three
+  lenses, seven states, twelve questions, six criteria). Faculty approve, edit
+  or reject each question, define the three pressure levels the proposal never
+  defined, approve the rubric, and lock. The lock refuses while anything is
+  unapproved, and the seal goes in the ledger.
+- **Trigger lab**: the rules that notice overclaims, evasions and requests for
+  answers, disclosed in full and run against fixtures. Style pairs test the
+  proposal's fairness boundary (p.3). Today the rules breach it on two of four
+  pairs. The studio shows that rather than hiding it.
+- **Dry run**: the seven-minute defense with a scripted fictional candidate.
+  Only approved questions are asked, and every teaching-profile setting changes
+  what happens.
+- **Readiness**: criterion-level evidence for a synthetic cohort, with
+  overrides that add entries and never edit, a refusal to combine criteria into
+  one score, and NO_SCORE for stopped sessions.
+- **Ledger**: `tactik_eval`'s format, so `verify/verify.mjs` and
+  `python3 -m tactik_eval.verify` check the export. Candidate text stays out of
+  entry bodies (salted hashes only), so it can be erased while the chain still
+  verifies.
+
+```bash
+python3 -m tactik_eval.edu webscript.json   # recompute the seal, list blockers
+```
+
+What it does not establish: that rehearsal helps, that the disclosed rules are
+adequate (they are not yet), or any compliance with FERPA or institutional
+policy. Fictional data in one browser proves none of those.
 
 ## What this does not establish
 

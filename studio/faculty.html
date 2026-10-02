@@ -1,0 +1,1903 @@
+<title>TACTIK Faculty Studio</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  /* Layout: a two-pane console. A quiet rail of seven workspaces beside one wide
+     working column. Refusals are the only loud color on the page. */
+  :root {
+    --ground:      #F3F4F8;
+    --surface:     #FFFFFF;
+    --surface-alt: #EAEDF3;
+    --ink:         #14203A;
+    --ink-soft:    #3D4A66;
+    --muted:       #66718C;
+    --rule:        #DCE0E9;
+    --rule-strong: #C3CAD8;
+    --crimson:     #9E1B22;
+    --crimson-wash:#F7EAEA;
+    --green:       #14624E;
+    --green-wash:  #E4EFEA;
+    --amber:       #855400;
+    --amber-wash:  #FAF0DA;
+    --focus:       #2F5BD3;
+
+    --display: Spectral, Georgia, "Times New Roman", serif;
+    --body: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+    --step--1: 0.8125rem;
+    --step-0: 0.9375rem;
+    --step-1: 1.0625rem;
+    --step-2: 1.375rem;
+    --step-3: 1.875rem;
+    --radius: 6px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:      #0D1320;
+      --surface:     #141C2C;
+      --surface-alt: #1B2437;
+      --ink:         #E7EBF3;
+      --ink-soft:    #BAC3D4;
+      --muted:       #8D99B1;
+      --rule:        #262F45;
+      --rule-strong: #35405B;
+      --crimson:     #E8777C;
+      --crimson-wash:#2B1A1F;
+      --green:       #5BC0A0;
+      --green-wash:  #11251F;
+      --amber:       #E2B45E;
+      --amber-wash:  #2A2213;
+      --focus:       #8DA9FF;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground:      #0D1320;
+    --surface:     #141C2C;
+    --surface-alt: #1B2437;
+    --ink:         #E7EBF3;
+    --ink-soft:    #BAC3D4;
+    --muted:       #8D99B1;
+    --rule:        #262F45;
+    --rule-strong: #35405B;
+    --crimson:     #E8777C;
+    --crimson-wash:#2B1A1F;
+    --green:       #5BC0A0;
+    --green-wash:  #11251F;
+    --amber:       #E2B45E;
+    --amber-wash:  #2A2213;
+    --focus:       #8DA9FF;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { background: var(--ground); }
+  body {
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: var(--step-0);
+    line-height: 1.55;
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+  }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+  .shell {
+    display: grid;
+    grid-template-columns: 15rem minmax(0, 1fr);
+    min-height: 100%;
+  }
+  .rail {
+    border-right: 1px solid var(--rule);
+    background: var(--surface);
+    padding: 1.5rem 0.75rem 2rem;
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    height: 100vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+  .brand { padding: 0 0.5rem; }
+  .brand__eyebrow {
+    font-size: 0.6875rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--muted); font-weight: 600;
+  }
+  .brand__name {
+    font-family: var(--display); font-weight: 600; font-size: var(--step-2);
+    line-height: 1.15; margin-top: 0.15rem;
+  }
+  .nav { display: flex; flex-direction: column; gap: 2px; }
+  .nav button {
+    display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;
+    text-align: left; border: 0; background: transparent; cursor: pointer;
+    padding: 0.5rem 0.6rem; border-radius: var(--radius); color: var(--ink-soft);
+    font-weight: 500;
+  }
+  .nav button:hover { background: var(--surface-alt); color: var(--ink); }
+  .nav button[aria-current="page"] { background: var(--ink); color: var(--surface); }
+  .nav .count {
+    font-size: 0.6875rem; font-variant-numeric: tabular-nums; font-weight: 600;
+    padding: 0.05rem 0.4rem; border-radius: 999px; background: var(--surface-alt); color: var(--ink-soft);
+  }
+  .nav button[aria-current="page"] .count { background: rgba(127,127,127,0.25); color: inherit; }
+  .nav .count--warn { background: var(--amber-wash); color: var(--amber); }
+  .nav .count--bad { background: var(--crimson-wash); color: var(--crimson); }
+  .nav .count--ok { background: var(--green-wash); color: var(--green); }
+  .actor { padding: 0 0.5rem; display: grid; gap: 0.3rem; }
+  .actor label { font-size: var(--step--1); color: var(--muted); }
+  .rail__foot { margin-top: auto; padding: 0 0.5rem; font-size: var(--step--1); color: var(--muted); }
+
+  main { min-width: 0; padding-block: 0 4rem; padding-inline: clamp(1rem, 3.5vw, 2.75rem); }
+  .banner {
+    margin: 0 calc(-1 * clamp(1rem, 3.5vw, 2.75rem)) 1.75rem;
+    padding: 0.55rem clamp(1rem, 3.5vw, 2.75rem);
+    background: var(--amber-wash); color: var(--amber);
+    border-bottom: 1px solid var(--rule);
+    font-size: var(--step--1); font-weight: 500;
+  }
+  .banner strong { letter-spacing: 0.08em; text-transform: uppercase; font-size: 0.6875rem; margin-right: 0.5rem; }
+  .alarm {
+    margin-bottom: 1.25rem; padding: 0.75rem 1rem; border: 1px solid var(--crimson);
+    background: var(--crimson-wash); color: var(--crimson); border-radius: var(--radius);
+  }
+
+  .view { max-width: 68rem; display: grid; gap: 2rem; }
+  .vhead { display: grid; gap: 0.35rem; max-width: 70ch; }
+  .vhead__eyebrow { font-size: 0.6875rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  h1 { font-family: var(--display); font-weight: 600; font-size: var(--step-3); line-height: 1.12; margin: 0; text-wrap: balance; }
+  h2 { font-family: var(--display); font-weight: 600; font-size: var(--step-2); line-height: 1.2; margin: 0; text-wrap: balance; }
+  h3 { font-size: var(--step-1); font-weight: 600; margin: 0; }
+  p { margin: 0; }
+  .lede { color: var(--ink-soft); }
+  .muted { color: var(--muted); }
+  .small { font-size: var(--step--1); }
+  .mono { font-family: var(--mono); font-size: 0.8125rem; word-break: break-all; }
+
+  .section { display: grid; gap: 0.9rem; padding-top: 1.5rem; border-top: 1px solid var(--rule); }
+  .section__head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0.5rem 1rem; }
+  .section__note { color: var(--muted); font-size: var(--step--1); max-width: 70ch; }
+
+  .panel {
+    background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+    padding: 1rem 1.1rem; display: grid; gap: 0.75rem; min-width: 0;
+  }
+  .panel--status { border-color: var(--rule-strong); }
+  .refusal {
+    border: 1px solid var(--crimson); background: var(--crimson-wash); color: var(--ink);
+    border-radius: var(--radius); padding: 0.9rem 1rem; display: grid; gap: 0.5rem;
+  }
+  .refusal__title { color: var(--crimson); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; font-size: 0.75rem; }
+  .ok-box {
+    border: 1px solid var(--green); background: var(--green-wash); border-radius: var(--radius);
+    padding: 0.9rem 1rem; display: grid; gap: 0.4rem;
+  }
+  .ok-box__title { color: var(--green); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; font-size: 0.75rem; }
+
+  .row { display: flex; flex-wrap: wrap; gap: 0.5rem 0.75rem; align-items: center; }
+  .stack { display: grid; gap: 0.6rem; }
+  .grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+  .split { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 1rem; align-items: start; }
+
+  .pill {
+    display: inline-flex; align-items: center; gap: 0.3rem; white-space: nowrap;
+    font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 0.15rem 0.5rem; border-radius: 999px; border: 1px solid var(--rule-strong); color: var(--ink-soft);
+  }
+  .pill--draft { background: var(--amber-wash); color: var(--amber); border-color: transparent; }
+  .pill--ok { background: var(--green-wash); color: var(--green); border-color: transparent; }
+  .pill--bad { background: var(--crimson-wash); color: var(--crimson); border-color: transparent; }
+  .pill--ink { background: var(--ink); color: var(--surface); border-color: transparent; }
+  .pill--hollow { border-style: dashed; }
+
+  .btn {
+    border: 1px solid var(--rule-strong); background: var(--surface); color: var(--ink);
+    padding: 0.4rem 0.8rem; border-radius: var(--radius); cursor: pointer; font-weight: 500;
+    font-size: var(--step--1); line-height: 1.4;
+  }
+  .btn:hover:not(:disabled) { border-color: var(--ink-soft); }
+  .btn--primary { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+  .btn--primary:hover:not(:disabled) { opacity: 0.9; }
+  .btn--danger { color: var(--crimson); border-color: var(--crimson); }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  label.field { display: grid; gap: 0.3rem; min-width: 0; }
+  label.field > span { font-size: var(--step--1); color: var(--muted); font-weight: 500; }
+  input[type="text"], input[type="number"], select, textarea {
+    width: 100%; border: 1px solid var(--rule-strong); border-radius: var(--radius);
+    background: var(--surface); padding: 0.45rem 0.6rem; min-width: 0;
+  }
+  textarea { resize: vertical; min-height: 2.6rem; line-height: 1.45; }
+  input:disabled, select:disabled, textarea:disabled { background: var(--surface-alt); color: var(--ink-soft); }
+  input[type="range"] { width: 100%; accent-color: var(--ink); }
+
+  .tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: var(--step--1); }
+  th, td { text-align: left; vertical-align: top; padding: 0.55rem 0.7rem; border-bottom: 1px solid var(--rule); }
+  th { font-weight: 600; color: var(--muted); font-size: 0.6875rem; letter-spacing: 0.08em; text-transform: uppercase; background: var(--surface-alt); white-space: nowrap; }
+  tr:last-child td { border-bottom: 0; }
+  td.num, th.num { font-variant-numeric: tabular-nums; text-align: right; }
+
+  .q { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr) auto; gap: 0.6rem 0.9rem; align-items: start; padding: 0.8rem 0; border-bottom: 1px solid var(--rule); }
+  .q:last-child { border-bottom: 0; }
+  .q__meta { display: grid; gap: 0.25rem; font-size: var(--step--1); }
+  .q__id { font-family: var(--mono); font-weight: 500; }
+  .q__actions { display: grid; gap: 0.35rem; justify-items: end; }
+
+  .cell {
+    width: 100%; border: 1px solid var(--rule); background: var(--surface); border-radius: var(--radius);
+    padding: 0.35rem 0.5rem; cursor: pointer; text-align: left; display: grid; gap: 0.1rem; min-width: 7.5rem;
+  }
+  .cell:hover { border-color: var(--ink-soft); }
+  .cell[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+  .cell__lvl { font-variant-numeric: tabular-nums; font-weight: 600; }
+  .cell--und { border-style: dashed; color: var(--ink-soft); }
+  .lvl-0 .cell__lvl { color: var(--crimson); }
+  .lvl-1 .cell__lvl { color: var(--amber); }
+  .lvl-2 .cell__lvl, .lvl-3 .cell__lvl { color: var(--green); }
+  .noscore { color: var(--muted); font-style: italic; }
+
+  .turn { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr); gap: 0.25rem 0.9rem; padding: 0.55rem 0; }
+  .turn__who { font-size: var(--step--1); color: var(--muted); font-weight: 600; }
+  .turn--candidate .turn__text { background: var(--surface-alt); border-radius: var(--radius); padding: 0.45rem 0.65rem; }
+  .turn--rule .turn__text { border-left: 2px solid var(--ink-soft); padding-left: 0.65rem; color: var(--ink-soft); }
+  .turn--blocked .turn__text { color: var(--crimson); font-weight: 500; }
+  .state-head { padding-top: 1.1rem; display: flex; flex-wrap: wrap; gap: 0.4rem 0.8rem; align-items: baseline; }
+  .state-head h3 { font-family: var(--display); font-size: var(--step-1); }
+
+  .kv { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 0.3rem 1rem; font-size: var(--step--1); }
+  .kv dt { color: var(--muted); }
+  .kv dd { margin: 0; min-width: 0; }
+  ul.plain { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
+  code { font-family: var(--mono); font-size: 0.8125rem; background: var(--surface-alt); padding: 0.05rem 0.3rem; border-radius: 4px; }
+  pre.cmd { margin: 0; font-family: var(--mono); font-size: 0.8125rem; background: var(--surface-alt); padding: 0.7rem 0.85rem; border-radius: var(--radius); overflow-x: auto; }
+  details > summary { cursor: pointer; font-weight: 500; }
+  .stat { display: grid; gap: 0.1rem; }
+  .stat__n { font-family: var(--display); font-size: var(--step-2); font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .stat__l { font-size: var(--step--1); color: var(--muted); }
+  .stats { display: flex; flex-wrap: wrap; gap: 1.25rem 2.25rem; }
+
+  @media (max-width: 860px) {
+    .shell { grid-template-columns: minmax(0, 1fr); }
+    .rail {
+      position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; height: auto;
+      flex-direction: column; gap: 0.6rem; padding: 0.7rem 1rem; border-right: 0; border-bottom: 1px solid var(--rule);
+    }
+    .brand { display: flex; align-items: baseline; gap: 0.6rem; padding: 0; }
+    .brand__name { font-size: var(--step-1); margin: 0; }
+    .nav { flex-direction: row; overflow-x: auto; gap: 0.25rem; padding-bottom: 0.15rem; }
+    .nav button { flex: 0 0 auto; padding: 0.35rem 0.6rem; }
+    .actor, .rail__foot { display: none; }
+    .grid2, .grid3, .split { grid-template-columns: minmax(0, 1fr); }
+    .q { grid-template-columns: minmax(0, 1fr); }
+    .q__actions { justify-items: start; grid-auto-flow: column; justify-content: start; }
+    .turn { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>
+
+<div class="shell">
+  <aside class="rail" aria-label="Studio navigation">
+    <div class="brand">
+      <div class="brand__eyebrow">TACTIK EDU</div>
+      <div class="brand__name">Faculty Studio</div>
+    </div>
+    <nav class="nav" id="nav"></nav>
+    <div class="actor">
+      <label for="actor">Acting as</label>
+      <input type="text" id="actor" autocomplete="off">
+      <span class="small muted">Approvals and overrides carry this name. There is no sign-in in this demo.</span>
+    </div>
+    <div class="rail__foot">Fictional data. Runs in this browser. No AI model is called.</div>
+  </aside>
+  <main>
+    <div class="banner"><strong>Demo</strong>Fictional institution, course, dossier and candidates. Nothing here is an academic record. Everything stays in this browser.</div>
+    <div id="alarm"></div>
+    <div id="view"></div>
+  </main>
+</div>
+
+<script id="studio-core">
+/* TACTIK EDU Faculty Studio, core. No DOM, no network, no randomness except
+   content salts. Answerable to docs/HASHING.md and docs/WEBSCRIPT.md, and run
+   by tests/test_studio.py under Node against the Python implementation. */
+(function (root) {
+  "use strict";
+
+  // ---------- SHA-256 (FIPS 180-4), synchronous, UTF-8 input ----------
+  const K = [
+    0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+    0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+    0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+    0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+    0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+    0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+    0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+    0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2,
+  ];
+  const rotr = (x, n) => (x >>> n) | (x << (32 - n));
+
+  function sha256Hex(text) {
+    const bytes = new TextEncoder().encode(text);
+    const length = bytes.length;
+    const padded = new Uint8Array(((length + 9 + 63) >> 6) << 6);
+    padded.set(bytes);
+    padded[length] = 0x80;
+    const view = new DataView(padded.buffer);
+    view.setUint32(padded.length - 8, Math.floor(length / 0x20000000));
+    view.setUint32(padded.length - 4, (length << 3) >>> 0);
+    const H = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19];
+    const w = new Uint32Array(64);
+    for (let offset = 0; offset < padded.length; offset += 64) {
+      for (let i = 0; i < 16; i++) w[i] = view.getUint32(offset + i * 4);
+      for (let i = 16; i < 64; i++) {
+        const s0 = rotr(w[i - 15], 7) ^ rotr(w[i - 15], 18) ^ (w[i - 15] >>> 3);
+        const s1 = rotr(w[i - 2], 17) ^ rotr(w[i - 2], 19) ^ (w[i - 2] >>> 10);
+        w[i] = (w[i - 16] + s0 + w[i - 7] + s1) >>> 0;
+      }
+      let [a, b, c, d, e, f, g, h] = H;
+      for (let i = 0; i < 64; i++) {
+        const S1 = rotr(e, 6) ^ rotr(e, 11) ^ rotr(e, 25);
+        const ch = (e & f) ^ (~e & g);
+        const t1 = (h + S1 + ch + K[i] + w[i]) >>> 0;
+        const S0 = rotr(a, 2) ^ rotr(a, 13) ^ rotr(a, 22);
+        const maj = (a & b) ^ (a & c) ^ (b & c);
+        const t2 = (S0 + maj) >>> 0;
+        h = g; g = f; f = e; e = (d + t1) >>> 0; d = c; c = b; b = a; a = (t1 + t2) >>> 0;
+      }
+      H[0] = (H[0] + a) >>> 0; H[1] = (H[1] + b) >>> 0; H[2] = (H[2] + c) >>> 0; H[3] = (H[3] + d) >>> 0;
+      H[4] = (H[4] + e) >>> 0; H[5] = (H[5] + f) >>> 0; H[6] = (H[6] + g) >>> 0; H[7] = (H[7] + h) >>> 0;
+    }
+    return H.map((x) => x.toString(16).padStart(8, "0")).join("");
+  }
+
+  // ---------- canonical form (docs/HASHING.md) ----------
+  function canonical(value, path = "$") {
+    if (value === null) return "null";
+    const type = typeof value;
+    if (type === "boolean") return value ? "true" : "false";
+    if (type === "number") {
+      if (!Number.isInteger(value)) {
+        throw new Error(`${path}: float values are not hashable in this record; use an integer or a decimal string`);
+      }
+      if (!Number.isSafeInteger(value)) throw new Error(`${path}: integer ${value} exceeds exact range`);
+      return String(value);
+    }
+    if (type === "string") return JSON.stringify(value);
+    if (Array.isArray(value)) return `[${value.map((item, i) => canonical(item, `${path}[${i}]`)).join(",")}]`;
+    if (type === "object") {
+      const keys = Object.keys(value).sort();
+      return `{${keys.map((key) => `${JSON.stringify(key)}:${canonical(value[key], `${path}.${key}`)}`).join(",")}}`;
+    }
+    throw new Error(`${path}: ${type} is not serializable`);
+  }
+  const digest = (value) => sha256Hex(canonical(value));
+
+  // ---------- append-only ledger (tactik_eval/record.py semantics) ----------
+  const GENESIS = "0".repeat(64);
+  const headOf = (ledger) => (ledger.entries.length ? ledger.entries[ledger.entries.length - 1].link : GENESIS);
+  const linkOf = (e) => digest({ index: e.index, kind: e.kind, body: e.body, previous: e.previous });
+  const contentHashOf = (e) => digest({ kind: e.kind, body: e.body });
+
+  function appendEntry(ledger, kind, body) {
+    if (typeof kind !== "string" || !kind.trim()) throw new Error("an entry requires a kind");
+    if (kind === "withdrawal") throw new Error("the studio never writes withdrawals; tactik_eval reserves that kind");
+    const entry = { index: ledger.entries.length, kind, body, previous: headOf(ledger) };
+    entry.link = linkOf(entry);
+    ledger.entries.push(entry);
+    return entry;
+  }
+
+  function ledgerPayload(ledger) {
+    return {
+      head: headOf(ledger),
+      entries: ledger.entries.map((e) => ({ index: e.index, kind: e.kind, body: e.body, previous: e.previous, link: e.link })),
+    };
+  }
+
+  function verifyLedgerPayload(payload) {
+    const problems = [];
+    const entries = Array.isArray(payload && payload.entries) ? payload.entries : [];
+    let previous = GENESIS;
+    entries.forEach((entry, position) => {
+      if (entry.index !== position) problems.push(`entry at position ${position} claims index ${entry.index}`);
+      if (entry.previous !== previous) problems.push(`entry ${position} breaks the chain`);
+      let recomputed = null;
+      try { recomputed = linkOf(entry); } catch (err) { problems.push(`entry ${position}: ${err.message}`); }
+      if (recomputed !== entry.link) problems.push(`entry ${position} link mismatch`);
+      previous = recomputed || "";
+    });
+    const recordedHead = payload && payload.head !== undefined ? payload.head : GENESIS;
+    if (recordedHead !== previous) problems.push("head mismatch");
+    return { ok: problems.length === 0, problems, head: previous, count: entries.length };
+  }
+
+  // ---------- content store: candidate text never enters an entry body ----------
+  function randomSalt() {
+    const bytes = new Uint8Array(16);
+    root.crypto.getRandomValues(bytes);
+    return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+  }
+  function storeContent(store, text) {
+    const salt = randomSalt();
+    const ref = digest({ salt, text });
+    store[ref] = { salt, text };
+    return ref;
+  }
+
+  // ---------- Webscript gates (docs/WEBSCRIPT.md) ----------
+  const FORMAT = "tactik-edu/webscript@1";
+  const SYSTEM = "system";
+  const WEIGHT_TOTAL_BP = 10000;
+  const MANDATORY_EVENTS = ["unsupported_claim", "high_confidence_low_evidence", "self_correction", "evasion_repeat", "answer_request"];
+  const MANDATORY_STOPS = ["participant_requests_stop", "restricted_information", "departs_from_approved_scope", "generates_student_work", "faculty_concern"];
+  const isBlank = (s) => typeof s !== "string" || !s.trim();
+
+  function lockBlockers(ws) {
+    const out = [];
+    const add = (code, detail) => out.push({ code, detail });
+    const o = ws.objective;
+    if (isBlank(o.target)) add("OBJECTIVE_INCOMPLETE", "objective target is blank");
+    if (isBlank(o.floor)) add("OBJECTIVE_INCOMPLETE", "objective floor is blank");
+    if (!o.must_not_happen.some((c) => !isBlank(c))) add("OBJECTIVE_INCOMPLETE", "objective must_not_happen is blank");
+
+    const lensKeys = new Set(ws.lenses.map((l) => l.key));
+    const states = new Map(ws.states.map((s) => [s.key, s]));
+    const n = ws.states.length;
+    if (!n || ws.states[0].owner !== SYSTEM || ws.states[n - 1].owner !== SYSTEM) {
+      add("STATES_UNBOUNDED", "the first and last states must be system-owned (orientation and debrief); a session must not wander");
+    }
+    for (const s of ws.states) {
+      if (s.owner !== SYSTEM && !lensKeys.has(s.owner)) add("STATE_OWNER_UNKNOWN", `${s.key} is owned by unknown '${s.owner}'`);
+      if (isBlank(s.goal) || isBlank(s.exit)) add("STATE_INCOMPLETE", `${s.key} needs a goal and an exit condition`);
+    }
+    const defined = new Map(ws.pressure_levels.map((p) => [p.level, p.definition]));
+    for (const level of [1, 2, 3]) {
+      if (isBlank(defined.get(level))) add("PRESSURE_UNDEFINED", `pressure level ${level} has no definition`);
+    }
+    for (const q of ws.questions) {
+      if (q.status === "DRAFT") add("QUESTION_PENDING", `${q.qid} awaits faculty approval`);
+      else if (isBlank(q.approved_by)) add("QUESTION_UNATTRIBUTED", `${q.qid} is approved by nobody named`);
+      const s = states.get(q.state);
+      if (!s || s.owner === SYSTEM || s.owner !== q.lens) add("QUESTION_MISPLACED", `${q.qid}: lens '${q.lens}' does not own state '${q.state}'`);
+    }
+    for (const s of ws.states) {
+      if (s.owner === SYSTEM) continue;
+      if (!ws.questions.some((q) => q.state === s.key && q.status === "APPROVED")) add("STATE_WITHOUT_QUESTION", `${s.key} has no approved question`);
+    }
+    const responses = new Map(ws.event_rules.map((r) => [r.event, r.response]));
+    for (const event of MANDATORY_EVENTS) {
+      if (isBlank(responses.get(event))) add("EVENT_RULE_MISSING", `rule '${event}' is missing or blank`);
+    }
+    const stops = new Map(ws.stop_conditions.map((s) => [s.key, s.text]));
+    for (const key of MANDATORY_STOPS) {
+      if (isBlank(stops.get(key))) add("STOP_CONDITION_MISSING", `stop condition '${key}' is missing or blank`);
+    }
+    const crit = ws.rubric.criteria;
+    const total = crit.reduce((sum, c) => sum + c.weight_bp, 0);
+    if (total !== WEIGHT_TOTAL_BP || crit.some((c) => !(c.weight_bp > 0))) {
+      add("RUBRIC_WEIGHTS", `weights total ${total} basis points; they must be positive and total ${WEIGHT_TOTAL_BP}`);
+    }
+    for (const c of crit) {
+      if (c.anchors.some(isBlank)) add("RUBRIC_ANCHOR_BLANK", `${c.key} has a blank level anchor`);
+    }
+    if (ws.rubric.status !== "APPROVED" || isBlank(ws.rubric.approved_by)) add("RUBRIC_PENDING", "the rubric awaits named faculty approval");
+    return out;
+  }
+
+  // ---------- teaching profile: every field changes behavior ----------
+  const startingPressure = (p) => (p.challenge_intensity <= 33 ? 1 : p.challenge_intensity <= 66 ? 2 : 3);
+  const escalatesOnConfidence = (p) => p.evidence_strictness >= 50;
+
+  // ---------- disclosed trigger rules (proposal p.22: "disclose the heuristic") ----------
+  const EVIDENCE = /\b(?:table|figure|appendix|interview(?:s|ee|ees)?|survey item|joint display|cluster)\b|\b[rn]\s?=\s?[-.\d]|\bp\.\s?\d|\b\d+\s+(?:of|out of)\s+\d+\b/i;
+  const words = (t) => new Set(t.toLowerCase().match(/[a-zÀ-ɏ']+/g) || []);
+  function jaccard(a, b) {
+    if (!a.size && !b.size) return 0;
+    let shared = 0;
+    for (const w of a) if (b.has(w)) shared++;
+    return shared / (a.size + b.size - shared);
+  }
+  const DETECTORS = [
+    { event: "answer_request", label: "Request for an answer or rewrite",
+      rule: "write, rewrite, draft, give me, tell me what/the answer, what should I say, fix my/this/it, can you answer/say",
+      test: (t) => /\b(?:(?:re)?write|draft|give me|tell me (?:what|the answer)|what should I say|fix (?:my|this|it)|can you (?:answer|say))\b/i.test(t) },
+    { event: "causal_language", label: "Causal language from a cross-sectional design",
+      rule: "improve, cause, lead(s) to, led to, drive(s), result(s) in, boost, increase, reduce, only when the dossier design is cross-sectional",
+      test: (t, ctx) => ctx.design === "cross-sectional" && /\b(?:improv(?:e|es|ed|ing)|caus(?:e|es|ed|ing)|leads? to|led to|driv(?:e|es|en|ing)|results? in|boost(?:s|ed|ing)?|increas(?:e|es|ed|ing)|reduc(?:e|es|ed|ing))\b/i.test(t) },
+    { event: "self_correction", label: "Candidate self-corrects",
+      rule: "let me restate/revise/correct/rephrase, more precisely, I overstated, I should say/restate, to be accurate/precise, correct myself",
+      test: (t) => /\b(?:let me (?:restate|revise|correct|rephrase)|more precisely|I overstated|I should (?:say|restate|rephrase)|to be (?:accurate|precise)|correct myself)\b/i.test(t) },
+    { event: "high_confidence_low_evidence", label: "High confidence, low evidence",
+      rule: "certainly, definitely, clearly, without (a) doubt, no question, I am confident/sure/certain, with no evidence marker",
+      test: (t) => /\b(?:certainly|definitely|clearly|without (?:a )?doubt|no question|I am (?:confident|sure|certain))\b/i.test(t) && !EVIDENCE.test(t) },
+    { event: "unsupported_claim", label: "Unsupported claim",
+      rule: "always, never, all, every, prove(s), undeniably, obviously, with no evidence marker",
+      test: (t) => /\b(?:always|never|all|every|proves?|undeniabl[ey]|obviously)\b/i.test(t) && !EVIDENCE.test(t) },
+    { event: "evasion_repeat", label: "Evasion or repetition",
+      rule: "as I (already) said, I already answered, next question, speaks for itself; or 60% word overlap with the previous turn",
+      test: (t, ctx) => /\b(?:as I (?:already )?said|I already answered|next question|speaks? for (?:itself|themselves))\b/i.test(t) || (ctx.previous != null && jaccard(words(t), words(ctx.previous)) >= 0.6) },
+  ];
+  const EVIDENCE_RULE = "table, figure, appendix, interview(s), survey item, joint display, cluster, r = / n = followed by a number, p. followed by a number, 'k of n'";
+
+  function detect(text, ctx) {
+    const context = { design: ctx && ctx.design, previous: ctx && ctx.previous != null ? ctx.previous : null };
+    return DETECTORS.filter((d) => d.test(text, context)).map((d) => d.event);
+  }
+
+  // ---------- dry run: the seven states, approved questions only ----------
+  function selectQuestion(ws, stateKey, pressure, used) {
+    const pool = ws.questions.filter((q) => q.state === stateKey && q.status === "APPROVED" && !used.has(q.qid));
+    if (!pool.length) return { question: null, note: "" };
+    const exact = pool.find((q) => q.pressure === pressure);
+    if (exact) return { question: exact, note: "" };
+    const below = pool.filter((q) => q.pressure < pressure).sort((a, b) => b.pressure - a.pressure)[0];
+    const chosen = below || pool.slice().sort((a, b) => a.pressure - b.pressure)[0];
+    const pending = ws.questions.find((q) => q.state === stateKey && q.pressure === pressure && q.status === "DRAFT");
+    const why = pending ? `${pending.qid} (level ${pressure}) is pending approval` : `no approved question at level ${pressure}`;
+    return { question: chosen, note: `${why}; using ${chosen.qid} (level ${chosen.pressure}).` };
+  }
+
+  function runDryRun(ws, script) {
+    const profile = ws.profile;
+    const rules = new Map(ws.event_rules.map((r) => [r.event, r.response]));
+    const lensName = new Map(ws.lenses.map((l) => [l.key, l.name]));
+    const steps = [];
+    const preserved = [];
+    const openObjections = [];
+    const counts = {};
+    let pressure = startingPressure(profile);
+    let pendingClaim = null;
+    const startPressure = pressure;
+
+    ws.states.forEach((state, position) => {
+      steps.push({ kind: "state", state: state.key, name: state.name, owner: state.owner, goal: state.goal, exit: state.exit });
+      const turns = (script[state.key] || []).slice();
+      if (state.owner === SYSTEM) {
+        if (position === ws.states.length - 1) {
+          steps.push({ kind: "system", speaker: "System",
+            text: `Debrief. Claims preserved in both versions: ${preserved.length}. Open objections: ${openObjections.length}. Pressure ended at level ${pressure}. No grade is produced.` });
+        } else {
+          steps.push({ kind: "system", speaker: "System",
+            text: "Orientation. This rehearsal uses a fictional dossier. It is not graded. Faculty can see the reasoning record; you can pause or stop at any time." });
+        }
+        turns.forEach((t) => steps.push({ kind: "candidate", speaker: "Candidate", text: t, events: [], pressure }));
+        return;
+      }
+      const used = new Set();
+      const ask = () => {
+        const pick = selectQuestion(ws, state.key, pressure, used);
+        if (!pick.question) return false;
+        used.add(pick.question.qid);
+        steps.push({ kind: "ask", speaker: lensName.get(state.owner) || state.owner, qid: pick.question.qid,
+          text: pick.question.text, pressure, level: pick.question.pressure, note: pick.note });
+        return true;
+      };
+      if (!ask()) {
+        steps.push({ kind: "blocked", speaker: "Studio",
+          text: `No approved question for ${state.name}. This state cannot run until faculty approve one.` });
+        return;
+      }
+      let evasions = 0;
+      let previous = null;
+      turns.forEach((turn, i) => {
+        const found = detect(turn, { design: ws.dossier.design, previous });
+        const suppressed = [];
+        let events = found;
+        if (found.includes("self_correction") && found.includes("causal_language")) {
+          // A restatement quotes the claim it retracts; the restatement rule wins.
+          events = found.filter((e) => e !== "causal_language");
+          suppressed.push("causal_language");
+        }
+        steps.push({ kind: "candidate", speaker: "Candidate", text: turn, events, suppressed, pressure });
+        events.forEach((e) => { counts[e] = (counts[e] || 0) + 1; });
+        const rule = (event, speaker, extra) => {
+          const response = rules.get(event);
+          if (isBlank(response)) return;
+          steps.push({ kind: "rule", speaker, event, text: response + (extra ? ` ${extra}` : "") });
+        };
+        const owner = lensName.get(state.owner) || state.owner;
+        let moveOn = false;
+        if (events.includes("answer_request")) {
+          rule("answer_request", owner);
+        } else {
+          if (events.includes("causal_language") && !isBlank(rules.get("causal_language"))) {
+            rule("causal_language", lensName.get("methodologist") || owner);
+            pendingClaim = { state: state.key, text: turn };
+          }
+          if (events.includes("self_correction")) {
+            if (pendingClaim) {
+              preserved.push({ original: pendingClaim.text, revised: turn, state: state.key });
+              pendingClaim = null;
+            }
+            rule("self_correction", owner);
+            moveOn = true;
+          }
+          if (events.includes("high_confidence_low_evidence")) {
+            if (escalatesOnConfidence(profile) && pressure < 3) {
+              pressure += 1;
+              rule("high_confidence_low_evidence", owner, `Pressure is now level ${pressure}.`);
+            } else if (escalatesOnConfidence(profile)) {
+              rule("high_confidence_low_evidence", owner, "Pressure is already at level 3.");
+            } else {
+              steps.push({ kind: "note", speaker: "Studio", text: "Confident claim without evidence noted. Evidence strictness is below 50, so pressure does not rise." });
+            }
+          }
+          if (events.includes("unsupported_claim")) rule("unsupported_claim", owner);
+          if (events.includes("evasion_repeat")) {
+            evasions += 1;
+            if (evasions >= profile.evasions_before_reframe) {
+              rule("evasion_repeat", owner);
+              openObjections.push({ state: state.key, qid: [...used].pop() });
+              evasions = 0;
+              moveOn = true;
+            } else {
+              steps.push({ kind: "note", speaker: "Studio", text: `Evasion ${evasions} of ${profile.evasions_before_reframe} before the question is reframed.` });
+            }
+          }
+          if (!events.length) steps.push({ kind: "note", speaker: "Studio", text: "The answer engages the question. No rule fires." });
+        }
+        if (moveOn && i < turns.length - 1) ask();
+        previous = turn;
+      });
+    });
+    return { steps, preserved, openObjections, counts, startPressure, finalPressure: pressure };
+  }
+
+  // ---------- the DBA template: TACTIK-drafted, faculty-owned ----------
+  const FIXTURE_FACULTY = "Faculty owner (fictional)";
+
+  function dbaTemplate() {
+    const q = (qid, state, lens, pressure, text, approved) => ({
+      qid, state, lens, pressure, text, status: approved ? "APPROVED" : "DRAFT", approved_by: approved ? FIXTURE_FACULTY : null,
+    });
+    return {
+      format: FORMAT,
+      webscript_id: "dba-defense-readiness",
+      version: 1,
+      supersedes: null,
+      course: { code: "DBA 700", title: "Dissertation Defense Readiness", institution: "Demo institution (fictional)" },
+      objective: {
+        target: "Each candidate defends the study's design and principal finding with dossier evidence, and keeps every claim inside what a cross-sectional mixed-methods design permits.",
+        floor: "Every criterion ends observed with cited evidence or marked undetermined with a reason, and every open objection is recorded for faculty follow-up.",
+        must_not_happen: [
+          "TACTIK writes, rewrites, or supplies the support for a candidate's claim.",
+          "Pressure changes because of fluency, accent, speed, or style rather than evidence.",
+          "Any output reads as a grade, a predicted grade, or a progression decision.",
+        ],
+      },
+      dossier: {
+        title: "AI Readiness and Strategic Decision Quality in Mid-Sized Logistics Firms: A Convergent Mixed-Methods Study",
+        design: "cross-sectional",
+        facts: [
+          "Quantitative strand: a one-time survey of 212 managers in 61 firms, 2025.",
+          "The 12-item AI readiness index correlates with self-reported decision quality, r = .41 (Table 6).",
+          "No longitudinal or experimental data. Firms were not randomly selected.",
+          "Qualitative strand: 14 semi-structured interviews with operations directors.",
+          "Interviewees describe faster scenario analysis; three of fourteen report slower approvals after adoption.",
+          "Integration: a joint display (Table 9) compares survey clusters with interview themes.",
+          "Stated limitation: common-method variance. Predictor and outcome are both self-reported.",
+        ],
+      },
+      lenses: [
+        { key: "chair", name: "Committee Chair", job: "Scholarly ownership", primary_lens: "Problem, purpose, question, design and finding alignment", boundary: "Open before narrowing; one question at a time" },
+        { key: "methodologist", name: "Methodologist", job: "Validity and inference", primary_lens: "Design, sampling, measurement, causality, mixed-method integration", boundary: "Challenge causal language immediately" },
+        { key: "skeptic", name: "Skeptical Member", job: "Alternatives and relevance", primary_lens: "Novelty, rival explanations, implications, boundary conditions", boundary: "Use one counterfactual; no hostility" },
+      ],
+      states: [
+        { key: "orientation", name: "Orientation", owner: "system", goal: "Disclose purpose, visibility, non-grading, pause, and the fictional dossier.", exit: "Candidate agrees to begin" },
+        { key: "opening", name: "Opening Defense", owner: "chair", goal: "State problem, contribution, design, and principal finding.", exit: "Opening claim map captured" },
+        { key: "coherence", name: "Coherence Round", owner: "chair", goal: "Test alignment and research ownership.", exit: "One claim defended; one alternative considered" },
+        { key: "method", name: "Method Round", owner: "methodologist", goal: "Expose causal, unit, method, and integration vulnerabilities.", exit: "Two vulnerabilities addressed" },
+        { key: "skeptic", name: "Skeptic Round", owner: "skeptic", goal: "Test novelty, implications, and boundaries.", exit: "Counterfactual and unsupported implication tested" },
+        { key: "self_correction", name: "Self-Correction", owner: "chair", goal: "Identify and revise the weakest claim.", exit: "Revision defended or declined with reasons" },
+        { key: "debrief", name: "Debrief", owner: "system", goal: "Separate observations, evidence, unresolved questions, and next actions.", exit: "Student and faculty outputs generated" },
+      ],
+      pressure_levels: [
+        { level: 1, definition: "" },
+        { level: 2, definition: "" },
+        { level: 3, definition: "" },
+      ],
+      questions: [
+        q("Q01", "opening", "chair", 1, "In two minutes: what problem does your study address, what did you find, and what does it add that was not known before?", true),
+        q("Q02", "opening", "chair", 2, "If the committee allowed you to defend only one finding, which would it be, and where does it appear in the dossier?", true),
+        q("Q03", "coherence", "chair", 1, "Walk from your research question to your design. Why does this design answer this question?", true),
+        q("Q04", "coherence", "chair", 2, "Name one design you considered and rejected. What would it have let you claim that this one cannot?", false),
+        q("Q05", "method", "methodologist", 1, "Your survey was administered once. What kind of claim does a single time point allow about AI readiness and decision quality?", true),
+        q("Q06", "method", "methodologist", 2, "The same managers report both readiness and decision quality. How does that shape what r = .41 can mean?", true),
+        q("Q07", "method", "methodologist", 3, "Show one place where the interview strand changes, rather than repeats, a conclusion from the survey strand.", false),
+        q("Q08", "skeptic", "skeptic", 1, "Who should be surprised by your finding, and why?", true),
+        q("Q09", "skeptic", "skeptic", 2, "Suppose larger firms both adopt AI earlier and decide better for other reasons. What in your data separates that explanation from yours?", true),
+        q("Q10", "skeptic", "skeptic", 3, "Three of fourteen interviewees report slower approvals after adoption. Under what conditions would your recommendation be wrong?", false),
+        q("Q11", "self_correction", "chair", 1, "Which of your claims today was the weakest? Restate it so it stays inside your evidence.", true),
+        q("Q12", "self_correction", "chair", 2, "Defend the restated claim, or tell us why you would keep the original.", false),
+      ],
+      event_rules: [
+        { event: "unsupported_claim", response: "Ask for the exact result or dossier location. Never provide the missing support." },
+        { event: "high_confidence_low_evidence", response: "Raise pressure one level and introduce the strongest alternative explanation." },
+        { event: "self_correction", response: "Preserve the original and the revised claim, then test the revised claim's boundary." },
+        { event: "evasion_repeat", response: "Reframe once, record the objection as open, and move on." },
+        { event: "answer_request", response: "Decline, and return the candidate to a reasoning question." },
+        { event: "causal_language", response: "Interrupt, ask for a non-causal restatement, and preserve both versions." },
+      ],
+      stop_conditions: [
+        { key: "participant_requests_stop", text: "The participant requests pause or stop." },
+        { key: "restricted_information", text: "Restricted, identifiable, employer-confidential, or research-participant information appears." },
+        { key: "departs_from_approved_scope", text: "Questioning departs materially from the approved dossier, objective, or rubric." },
+        { key: "generates_student_work", text: "The system begins generating student work instead of testing reasoning." },
+        { key: "faculty_concern", text: "A faculty reviewer identifies a material validity, fairness, privacy, or well-being concern." },
+      ],
+      visibility: {
+        student: ["Claims defended with evidence", "Claims revised, with both versions kept", "Open objections", "Next preparation actions", "No grade and no criterion levels"],
+        faculty: ["Criterion-level evidence", "Causal-language and boundary alerts", "Cohort patterns", "Teaching actions", "Review and override fields"],
+      },
+      rubric: {
+        weight_use: "prioritization",
+        status: "DRAFT",
+        approved_by: null,
+        criteria: [
+          { key: "ownership", name: "Research ownership", evidence: "Explains why major choices were made and identifies reasonable alternatives", weight_bp: 1500,
+            anchors: ["Cannot say why the major choices were made", "Explains choices when prompted, without alternatives", "Explains major choices and names a reasonable alternative", "Explains choices, names alternatives, and says what each would have changed"] },
+          { key: "coherence", name: "Problem-to-conclusion coherence", evidence: "Maintains alignment across problem, purpose, questions, design, findings, and implications", weight_bp: 1500,
+            anchors: ["Problem, questions and findings do not connect", "Connects some links; at least one break goes unnoticed", "Maintains alignment from problem to implications when challenged", "Maintains alignment unprompted and repairs a break once exposed"] },
+          { key: "method", name: "Methodological defense", evidence: "Defends design, sampling, measurement, inference, and integration", weight_bp: 2500,
+            anchors: ["Cannot state what the design permits", "States the design but overreaches on inference", "Bounds inference to the design when challenged", "Bounds inference unprompted and names the strongest threat to validity"] },
+          { key: "evidence", name: "Evidence discipline", evidence: "Separates result, interpretation, inference, and recommendation", weight_bp: 2000,
+            anchors: ["Result, interpretation and recommendation are fused", "Separates them only when asked", "Separates result, interpretation, inference and recommendation", "Separates them and cites the dossier location for each"] },
+          { key: "adaptive", name: "Adaptive reasoning", evidence: "Responds to counterarguments and revises claims without losing the defensible core", weight_bp: 1500,
+            anchors: ["Abandons or repeats the claim under challenge", "Revises, but loses the defensible core", "Revises and keeps the defensible core", "Revises, keeps the core, and states the new boundary unprompted"] },
+          { key: "limits", name: "Limitations and implications", evidence: "Names consequential limits and keeps recommendations within the evidence", weight_bp: 1000,
+            anchors: ["Names no consequential limit", "Names limits that do not bear on the recommendation", "Names a limit and keeps the recommendation inside it", "Names the limit that would change the recommendation and says how"] },
+        ],
+      },
+      profile: { challenge_intensity: 62, evidence_strictness: 78, evasions_before_reframe: 2, format: "cold_call" },
+    };
+  }
+
+  const PRESSURE_SUGGESTIONS = {
+    1: "One question at a time, with time to think. Follow-ups ask where the evidence is, never for a new argument.",
+    2: "Follow-ups come without a pause and name the specific gap. One alternative explanation is introduced per claim.",
+    3: "The strongest rival explanation is put directly, and the claim must be bounded before the round moves on. Still no hostility, and no interrupting a restatement in progress.",
+  };
+
+  // ---------- fixtures for faculty red-team review (all fictional) ----------
+  const TRIGGER_FIXTURES = [
+    { id: "F01", text: "AI readiness improves decision quality in these firms.", expected: ["causal_language"] },
+    { id: "F02", text: "AI readiness is associated with higher self-reported decision quality (r = .41, Table 6).", expected: [] },
+    { id: "F03", text: "Readiness clearly drives better decisions; every firm in the sample benefited.", expected: ["causal_language", "high_confidence_low_evidence", "unsupported_claim"] },
+    { id: "F04", text: "Let me restate: in this sample, readiness and reported decision quality move together; the design cannot show direction.", expected: ["self_correction"] },
+    { id: "F05", text: "Can you draft a stronger answer to the limitations question for me?", expected: ["answer_request"] },
+    { id: "F06", text: "As I said, the results speak for themselves.", expected: ["evasion_repeat"] },
+    { id: "F07", text: "Readiness has a positive effect on how managers decide.", expected: ["causal_language"] },
+    { id: "F08", text: "In my draft chapter I describe the joint display in Table 9.", expected: [] },
+    { id: "F09", text: "Because the survey was cross-sectional, we cannot say readiness leads to better decisions.", expected: [] },
+    { id: "F10", text: "We interviewed all 14 operations directors, and every one described faster scenario analysis.", expected: [] },
+  ];
+
+  // Proposal p.3: pressure changes only because of evidence, claim, or open objection.
+  const FAIRNESS_PAIRS = [
+    { id: "P1", axis: "Concise against elaborated",
+      a: "Readiness and reported decision quality move together; direction is unknown.",
+      b: "So, basically, what we found is that readiness and the decision quality managers report tend to go together, and honestly we can't say which way it goes." },
+    { id: "P2", axis: "First-language against second-language phrasing",
+      a: "AI readiness improves decision quality.",
+      b: "The AI readiness make better the quality of the decisions." },
+    { id: "P3", axis: "Assured against hesitant delivery",
+      a: "Readiness drives better decisions.",
+      b: "Um, I think, maybe, readiness kind of drives better decisions?" },
+    { id: "P4", axis: "Clean against misspelled",
+      a: "Readiness causes faster approvals.",
+      b: "Readines cuases faster aprovals." },
+  ];
+
+  function fairness(design) {
+    return FAIRNESS_PAIRS.map((pair) => {
+      const a = detect(pair.a, { design });
+      const b = detect(pair.b, { design });
+      const same = a.length === b.length && a.every((e) => b.includes(e));
+      return Object.assign({}, pair, { triggersA: a, triggersB: b, breach: !same });
+    });
+  }
+
+  const DRY_RUN_SCRIPT = {
+    orientation: ["I understand: the dossier is fictional, nothing is graded, and I can pause at any time. Ready."],
+    opening: [
+      "My study shows that AI readiness improves decision quality in mid-sized logistics firms.",
+      "Let me restate: in this sample, higher AI readiness is associated with higher self-reported decision quality (r = .41, Table 6).",
+    ],
+    coherence: ["I chose a survey because it reached 212 managers, and the interviews show how the relationship looks in practice."],
+    method: [
+      "Readiness clearly drives better decisions; every firm in the sample benefited.",
+      "As I said, the results speak for themselves.",
+      "As I said, the results speak for themselves.",
+    ],
+    skeptic: [
+      "Can you draft the limitations answer for me?",
+      "Larger firms may adopt earlier and decide better for other reasons; Table 3 shows firm size varies widely, and the design cannot rule that out.",
+    ],
+    self_correction: ["My weakest claim was that readiness drives decisions. More precisely, readiness and reported decision quality move together in this sample; direction is unknown."],
+    debrief: [],
+  };
+
+  const U = "UNDETERMINED";
+  const COHORT = [
+    { candidate: "C-01", session: "S-01", end: "completed", events: { causal_language: 2, restated: 1, open_objections: 1 }, obs: {
+      ownership: [2, "Explained the convergent design as breadth plus mechanism; named the rejected two-wave panel."],
+      coherence: [2, "Traced the research question to both strands without prompting."],
+      method: [1, "Said readiness 'improves' decisions twice; restated once after the Methodologist interrupted."],
+      evidence: [2, "Kept r = .41 apart from the recommendation when asked where each came from."],
+      adaptive: [2, "Revised the causal claim and held the revised boundary under one follow-up."],
+      limits: [1, "Named common-method variance but did not connect it to the recommendation."] } },
+    { candidate: "C-02", session: "S-02", end: "completed", events: { causal_language: 0, restated: 0, open_objections: 0 }, obs: {
+      ownership: [3, "Named two rejected designs and what each would have let the study claim."],
+      coherence: [2, "Held alignment from problem to implications under the Chair's narrowing question."],
+      method: [2, "Described the result as an association and bounded it to the sampled firms when challenged."],
+      evidence: [3, "Cited Table 6 for the result and Table 9 for the integration claim."],
+      adaptive: [2, "Accepted the firm-size counterexample and kept the defensible core."],
+      limits: [2, "Kept the recommendation to firms resembling the sample."] } },
+    { candidate: "C-03", session: "S-03", end: "stopped", events: { causal_language: 0, restated: 0, open_objections: 0 }, obs: null },
+    { candidate: "C-04", session: "S-04", end: "open", events: { causal_language: 3, restated: 0, open_objections: 2 }, obs: {
+      ownership: [2, "Explained the survey choice; the alternative named was generic."],
+      coherence: [1, "Lost the link between the second research question and the interview strand."],
+      method: [1, "Used 'drives' and 'leads to' for the survey result three times; no restatement."],
+      evidence: [1, "Separated result from recommendation only when asked twice."],
+      adaptive: [U, "The Skeptic round ended on time before a counterexample was posed; adaptation was never tested."],
+      limits: [1, "Listed sample size as the main limit; did not address common-method variance."] } },
+    { candidate: "C-05", session: "S-05", end: "completed", events: { causal_language: 1, restated: 1, open_objections: 0 }, obs: {
+      ownership: [2, "Justified the interview count with the saturation evidence in the dossier."],
+      coherence: [3, "Repaired a break between the problem statement and the second question once it was exposed."],
+      method: [2, "Restated 'improves' as 'is associated with' after one interruption and kept it."],
+      evidence: [2, "Separated result, interpretation and recommendation without prompting."],
+      adaptive: [3, "Revised the claim and stated the new boundary before being asked."],
+      limits: [2, "Named the slower-approval interviews as a boundary on the recommendation."] } },
+    { candidate: "C-06", session: "S-06", end: "open", events: { causal_language: 2, restated: 0, open_objections: 2 }, obs: {
+      ownership: [1, "Could not say why the interviews followed the survey rather than preceded it."],
+      coherence: [2, "Kept problem and findings aligned; implications drifted toward all logistics firms."],
+      method: [1, "Called the survey result causal twice; did not respond to the request for a restatement."],
+      evidence: [U, "Cited 'Table 12', which does not exist in the dossier; the rater could not verify which evidence was meant."],
+      adaptive: [1, "Repeated the original claim after the counterexample."],
+      limits: [0, "Named no limit that bears on the recommendation."] } },
+  ];
+
+  const TEACHING_DRAFTS = [
+    { id: "T1", pattern: "causal", text: "Open the next methods seminar with ten minutes on what a single-wave survey licenses: association, not direction. Use one anonymized restatement from this cohort as the worked example." },
+    { id: "T2", pattern: "limits", text: "Ask each candidate to bring one limitation that would change the recommendation, not only the method." },
+    { id: "T3", pattern: "open", text: "Before the formal defense, hold a fifteen-minute follow-up on each open objection, led by the faculty owner." },
+  ];
+
+  function seedState(actor) {
+    const ledger = { entries: [] };
+    const content = {};
+    const ws = dbaTemplate();
+    const at = "2026-10-01T15:00:00Z";
+    appendEntry(ledger, "fixture_loaded", {
+      notice: "Everything recorded below is fictional demo data for faculty red-team review. No real student, faculty member, or institution.",
+      tool: "TACTIK EDU Faculty Studio", format: FORMAT,
+    });
+    appendEntry(ledger, "webscript_drafted", { webscript_id: ws.webscript_id, version: ws.version, drafted_by: "TACTIK template library", draft_seal: digest(ws), at });
+    for (const q of ws.questions) {
+      if (q.status === "APPROVED") {
+        appendEntry(ledger, "question_approved", { webscript_id: ws.webscript_id, version: ws.version, qid: q.qid, text: q.text, approved_by: q.approved_by, at });
+      }
+    }
+    const draftSeal = digest(ws);
+    for (const c of COHORT) {
+      appendEntry(ledger, "session_opened", { session: c.session, candidate: c.candidate, webscript_id: ws.webscript_id, version: ws.version, draft_seal: draftSeal, purpose: "red-team rehearsal on synthetic data", at });
+      appendEntry(ledger, "session_events", Object.assign({ session: c.session, candidate: c.candidate }, c.events));
+      if (c.end === "stopped") {
+        appendEntry(ledger, "session_stopped", { session: c.session, candidate: c.candidate, condition: "participant_requests_stop", by: "Candidate (fictional)", result: "NO_SCORE", at });
+        continue;
+      }
+      for (const criterion of ws.rubric.criteria) {
+        const [level, note] = c.obs[criterion.key];
+        appendEntry(ledger, "observation_recorded", {
+          session: c.session, candidate: c.candidate, criterion: criterion.key, level,
+          note_ref: storeContent(content, note), rater: "Rater A (fictional)",
+        });
+      }
+      if (c.end === "completed") appendEntry(ledger, "session_completed", { session: c.session, candidate: c.candidate, at });
+    }
+    return { schema: 1, actor: actor || "Faculty owner (demo)", webscript: ws, locked: null, lockedVersions: [], ledger, content };
+  }
+
+  root.StudioCore = {
+    sha256Hex, canonical, digest, GENESIS, appendEntry, ledgerPayload, verifyLedgerPayload, contentHashOf,
+    storeContent, FORMAT, SYSTEM, MANDATORY_EVENTS, MANDATORY_STOPS, WEIGHT_TOTAL_BP, lockBlockers,
+    startingPressure, escalatesOnConfidence, DETECTORS, EVIDENCE_RULE, detect, selectQuestion, runDryRun, fairness,
+    dbaTemplate, PRESSURE_SUGGESTIONS, TRIGGER_FIXTURES, FAIRNESS_PAIRS, DRY_RUN_SCRIPT, COHORT, TEACHING_DRAFTS,
+    UNDETERMINED: U, seedState,
+  };
+})(globalThis);
+</script>
+
+<script>
+(function () {
+  "use strict";
+  const S = globalThis.StudioCore;
+  const KEY = "tactik-faculty-studio-v1";
+  const TABS = [
+    { id: "webscript", label: "Webscript" },
+    { id: "triggers", label: "Trigger lab" },
+    { id: "dryrun", label: "Dry run" },
+    { id: "readiness", label: "Readiness" },
+    { id: "controls", label: "Controls" },
+    { id: "ledger", label: "Ledger" },
+    { id: "boundaries", label: "Boundaries" },
+  ];
+  const LEVEL_NAMES = ["Not evident", "Emerging", "Defensible", "Strong"];
+  const EVENT_LABELS = Object.fromEntries(S.DETECTORS.map((d) => [d.event, d.label]));
+
+  // ---------- state ----------
+  function load() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (parsed && parsed.schema === 1 && parsed.webscript && parsed.ledger && Array.isArray(parsed.ledger.entries)) return parsed;
+    } catch (err) { /* unreadable storage: start from the fixture */ }
+    return null;
+  }
+  let state = load() || S.seedState("Faculty owner (demo)");
+  const firstTab = (location.hash || "").replace("#", "");
+  const ui = {
+    tab: TABS.some((t) => t.id === firstTab) ? firstTab : "webscript",
+    selected: null, flash: null, composite: false, confirmReset: false,
+    eraseConfirm: null, ledgerFilter: "", pasteResult: null, jsonShown: null,
+  };
+  let saveTimer = null;
+  function persist() {
+    clearTimeout(saveTimer);
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (err) { /* storage refused */ }
+  }
+  // Typing is debounced; a ledger entry is written through at once, so closing
+  // the tab right after an approval cannot lose it.
+  function save() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(persist, 150);
+  }
+
+  const ws = () => state.webscript;
+  const isLocked = () => !!(state.locked && state.locked.version === state.webscript.version);
+  const actor = () => (state.actor || "").trim();
+  const now = () => new Date().toISOString();
+  function record(kind, body) {
+    S.appendEntry(state.ledger, kind, body);
+    persist();
+  }
+
+  // ---------- DOM helper ----------
+  function h(tag, props, ...kids) {
+    const el = document.createElement(tag);
+    if (props) {
+      for (const [key, value] of Object.entries(props)) {
+        if (value === undefined || value === null || value === false) continue;
+        if (key.startsWith("on") && typeof value === "function") el.addEventListener(key.slice(2), value);
+        else if (key === "class") el.className = value;
+        else if (key === "value") el.value = value;
+        else if (key === "checked") el.checked = !!value;
+        else if (value === true) el.setAttribute(key, "");
+        else el.setAttribute(key, value);
+      }
+    }
+    for (const kid of kids.flat(Infinity)) {
+      if (kid === null || kid === undefined || kid === false) continue;
+      el.append(kid instanceof Node ? kid : String(kid));
+    }
+    return el;
+  }
+  const pill = (text, tone) => h("span", { class: `pill${tone ? ` pill--${tone}` : ""}` }, text);
+  const short = (hex) => (hex ? `${hex.slice(0, 12)}…` : "");
+  const pct = (bp) => `${Math.floor(bp / 100)}${bp % 100 ? `.${String(bp % 100).padStart(2, "0")}` : ""}%`;
+  const vhead = (eyebrow, title, lede) => h("header", { class: "vhead" },
+    h("div", { class: "vhead__eyebrow" }, eyebrow), h("h1", null, title), lede ? h("p", { class: "lede" }, lede) : null);
+  const section = (title, note, ...body) => h("section", { class: "section" },
+    h("div", { class: "section__head" }, h("h2", null, title)), note ? h("p", { class: "section__note" }, note) : null, ...body);
+
+  function needActor() {
+    if (actor()) return false;
+    ui.flash = { tone: "bad", text: "Enter your name in 'Acting as' first. Approvals and overrides must name a person." };
+    render();
+    return true;
+  }
+  function flashBox() {
+    if (!ui.flash) return null;
+    const f = ui.flash;
+    ui.flash = null;
+    return f.tone === "bad"
+      ? h("div", { class: "refusal", role: "alert" }, h("div", { class: "refusal__title" }, "Refused"), h("p", null, f.text))
+      : h("div", { class: "ok-box", role: "status" }, h("div", { class: "ok-box__title" }, "Recorded"), h("p", null, f.text));
+  }
+
+  async function copyText(text, id) {
+    try {
+      await navigator.clipboard.writeText(text);
+      ui.flash = { tone: "ok", text: "Copied to the clipboard." };
+      ui.jsonShown = null;
+    } catch (err) {
+      ui.jsonShown = id;
+      ui.flash = { tone: "ok", text: "The clipboard is not available here. The JSON is shown below; select it and copy." };
+    }
+    render();
+  }
+
+  // ---------- derived views of the ledger ----------
+  function derive() {
+    const sessions = new Map();
+    const obs = new Map();
+    const erased = new Set();
+    const teaching = new Map();
+    const reviews = new Map();
+    const charter = [];
+    for (const e of state.ledger.entries) {
+      const b = e.body;
+      switch (e.kind) {
+        case "session_opened": sessions.set(b.session, { session: b.session, candidate: b.candidate, status: "open", condition: null, events: {} }); break;
+        case "session_events": if (sessions.has(b.session)) sessions.get(b.session).events = b; break;
+        case "session_completed": if (sessions.has(b.session)) sessions.get(b.session).status = "completed"; break;
+        case "session_paused": if (sessions.has(b.session)) sessions.get(b.session).status = "paused"; break;
+        case "session_resumed": if (sessions.has(b.session)) sessions.get(b.session).status = "open"; break;
+        case "session_stopped":
+          if (sessions.has(b.session)) Object.assign(sessions.get(b.session), { status: "stopped", condition: b.condition, stoppedBy: b.by });
+          break;
+        case "observation_recorded":
+          obs.set(`${b.session}|${b.criterion}`, { session: b.session, candidate: b.candidate, criterion: b.criterion, level: b.level,
+            note_ref: b.note_ref, rater: b.rater, index: e.index, hash: S.contentHashOf(e), original: b.level, overrides: [] });
+          break;
+        case "observation_overridden": {
+          const o = obs.get(`${b.session}|${b.criterion}`);
+          if (o) { o.level = b.to; o.overrides.push({ index: e.index, from: b.from, to: b.to, reason_ref: b.reason_ref, by: b.by, hash: S.contentHashOf(e) }); o.hash = S.contentHashOf(e); }
+          break;
+        }
+        case "content_erased": erased.add(b.content_ref); break;
+        case "teaching_action": teaching.set(b.draft_id, b); break;
+        case "trigger_reviewed": reviews.set(b.fixture, b); break;
+        case "charter_event": charter.push(Object.assign({ index: e.index }, b)); break;
+        default: break;
+      }
+    }
+    return { sessions, obs, erased, teaching, reviews, charter };
+  }
+  function contentText(ref, erased) {
+    if (!ref) return null;
+    if (erased.has(ref) || !state.content[ref]) return null;
+    return state.content[ref].text;
+  }
+
+  // ---------- nav ----------
+  function navCounts() {
+    const blockers = S.lockBlockers(ws()).length;
+    const d = derive();
+    const stopped = [...d.sessions.values()].filter((s) => s.status === "stopped").length;
+    const breaches = S.fairness(ws().dossier.design).filter((p) => p.breach).length;
+    const verified = S.verifyLedgerPayload(S.ledgerPayload(state.ledger)).ok;
+    return {
+      webscript: isLocked() ? ["Locked", "ok"] : [`${blockers}`, blockers ? "warn" : "ok"],
+      triggers: [`${breaches} breach${breaches === 1 ? "" : "es"}`, breaches ? "bad" : "ok"],
+      readiness: [`${stopped} NO_SCORE`, stopped ? "warn" : ""],
+      ledger: [`${state.ledger.entries.length}`, verified ? "" : "bad"],
+    };
+  }
+  function renderNav() {
+    const counts = navCounts();
+    const nav = document.getElementById("nav");
+    nav.replaceChildren(...TABS.map((t) => {
+      const c = counts[t.id];
+      return h("button", { type: "button", "aria-current": ui.tab === t.id ? "page" : null,
+        onclick: () => { ui.tab = t.id; ui.selected = null; ui.composite = false; try { history.replaceState(null, "", `#${t.id}`); } catch (err) { /* sandboxed */ } render(); window.scrollTo(0, 0); } },
+        h("span", null, t.label), c ? h("span", { class: `count${c[1] ? ` count--${c[1]}` : ""}` }, c[0]) : null);
+    }));
+  }
+
+  // ---------- Webscript ----------
+  function statusCard() {
+    const w = ws();
+    const blockers = S.lockBlockers(w);
+    const locked = isLocked();
+    const seal = S.digest(w);
+    const groups = {};
+    for (const b of blockers) (groups[b.code] = groups[b.code] || []).push(b.detail);
+    return h("div", { class: "panel panel--status", id: "ws-status" },
+      h("div", { class: "row" },
+        h("h3", null, `Version ${w.version}`),
+        locked ? pill("Locked", "ok") : pill("Draft", "draft"),
+        w.supersedes ? h("span", { class: "small muted" }, `supersedes ${short(w.supersedes)}`) : null),
+      h("dl", { class: "kv" },
+        h("dt", null, locked ? "Seal" : "Seal if locked now"), h("dd", { class: "mono" }, seal),
+        locked ? [h("dt", null, "Locked by"), h("dd", null, `${state.locked.by}, ${state.locked.at}`)] : null,
+        h("dt", null, "Blockers"), h("dd", null, blockers.length ? `${blockers.length} must be resolved before locking` : "None. This script can be locked.")),
+      !locked && blockers.length ? h("details", { open: true },
+        h("summary", null, "What blocks the lock"),
+        h("ul", { class: "plain small" }, Object.entries(groups).map(([code, details]) =>
+          h("li", null, h("code", null, code), ` ${details.length > 1 ? `${details.length}× ` : ""}`, details.join("; "))))) : null,
+      h("div", { class: "row" },
+        locked
+          ? h("button", { type: "button", class: "btn btn--primary", onclick: startNextVersion }, `Start version ${w.version + 1} draft`)
+          : h("button", { type: "button", class: "btn btn--primary", onclick: lockWebscript }, "Lock this version"),
+        h("button", { type: "button", class: "btn", onclick: () => copyText(JSON.stringify({ webscript: w, seal }, null, 2), "webscript") }, "Copy Webscript JSON")),
+      ui.jsonShown === "webscript" ? h("textarea", { readonly: true, rows: 8, class: "mono", id: "ws-json", value: JSON.stringify({ webscript: w, seal }, null, 2) }) : null);
+  }
+  function refreshStatus() {
+    const old = document.getElementById("ws-status");
+    if (old) old.replaceWith(statusCard());
+    renderNav();
+  }
+  function touched() { save(); refreshStatus(); }
+
+  function lockWebscript() {
+    const w = ws();
+    const blockers = S.lockBlockers(w);
+    if (blockers.length) {
+      ui.flash = { tone: "bad", text: `This version cannot be locked yet: ${blockers.length} blocker(s), listed below. A locked script with an unapproved question or an undefined pressure level would let unreviewed content reach a candidate.` };
+      render();
+      return;
+    }
+    if (needActor()) return;
+    const seal = S.digest(w);
+    const at = now();
+    record("webscript_locked", { webscript_id: w.webscript_id, version: w.version, seal, supersedes: w.supersedes, locked_by: actor(), at });
+    state.locked = { version: w.version, seal, by: actor(), at };
+    state.lockedVersions.push({ version: w.version, seal, by: actor(), at });
+    ui.flash = { tone: "ok", text: `Version ${w.version} is locked. Its seal is in the ledger; any session record can now prove which script it ran.` };
+    save();
+    render();
+  }
+  function startNextVersion() {
+    const next = JSON.parse(JSON.stringify(ws()));
+    next.version += 1;
+    next.supersedes = state.locked.seal;
+    state.webscript = next;
+    record("webscript_drafted", { webscript_id: next.webscript_id, version: next.version, supersedes: next.supersedes, drafted_by: actor() || "unnamed", at: now() });
+    ui.flash = { tone: "ok", text: `Version ${next.version} is a new draft. Version ${next.version - 1} stays locked and its seal is unchanged.` };
+    render();
+  }
+
+  function textField(id, label, value, onInput, opts) {
+    const o = opts || {};
+    return h("label", { class: "field", for: id }, h("span", null, label),
+      h("textarea", { id, rows: o.rows || 2, disabled: isLocked(), value, oninput: (e) => onInput(e.target.value) }));
+  }
+
+  function objectiveView() {
+    const o = ws().objective;
+    return h("div", { class: "stack" },
+      textField("obj-target", "Target", o.target, (v) => { o.target = v; touched(); }),
+      textField("obj-floor", "Floor: the minimum that makes the rehearsal worth running", o.floor, (v) => { o.floor = v; touched(); }),
+      h("div", { class: "stack" }, h("span", { class: "small muted" }, "Must not happen"),
+        o.must_not_happen.map((clause, i) => h("textarea", { id: `obj-mnh-${i}`, rows: 2, disabled: isLocked(), value: clause, "aria-label": `Must not happen ${i + 1}`,
+          oninput: (e) => { o.must_not_happen[i] = e.target.value; touched(); } }))));
+  }
+
+  function dossierView() {
+    const d = ws().dossier;
+    return h("div", { class: "panel" },
+      h("h3", null, d.title),
+      h("div", { class: "row" }, pill(`design: ${d.design}`, "ink"), h("span", { class: "small muted" }, "A cross-sectional design enables the causal-language trigger.")),
+      h("ul", { class: "plain" }, d.facts.map((f) => h("li", null, f))));
+  }
+
+  function lensesView() {
+    return h("div", { class: "grid3" }, ws().lenses.map((l) => h("div", { class: "panel" },
+      h("h3", null, l.name), h("p", { class: "small" }, h("strong", null, l.job), `. ${l.primary_lens}.`),
+      h("p", { class: "small muted" }, `Boundary: ${l.boundary}.`))));
+  }
+
+  function statesView() {
+    const lensName = new Map(ws().lenses.map((l) => [l.key, l.name]));
+    return h("div", { class: "tablewrap" }, h("table", null,
+      h("thead", null, h("tr", null, h("th", { class: "num" }, "#"), h("th", null, "State"), h("th", null, "Owner"), h("th", null, "Goal"), h("th", null, "Exit condition"))),
+      h("tbody", null, ws().states.map((s, i) => h("tr", null,
+        h("td", { class: "num" }, i + 1), h("td", null, s.name), h("td", null, s.owner === "system" ? "System" : lensName.get(s.owner) || s.owner),
+        h("td", null, s.goal), h("td", null, s.exit))))));
+  }
+
+  function pressureView() {
+    return h("div", { class: "grid3" }, ws().pressure_levels.map((p) => {
+      const id = `pressure-${p.level}`;
+      return h("div", { class: "stack" },
+        h("label", { class: "field", for: id }, h("span", null, `Level ${p.level}`),
+          h("textarea", { id, rows: 4, disabled: isLocked(), value: p.definition, placeholder: "Not yet defined by faculty",
+            oninput: (e) => { p.definition = e.target.value; touched(); } })),
+        !isLocked() && !p.definition.trim() ? h("button", { type: "button", class: "btn", onclick: () => { p.definition = S.PRESSURE_SUGGESTIONS[p.level]; save(); render(); } }, "Start from TACTIK's suggestion") : null);
+    }));
+  }
+
+  function questionRow(q) {
+    const w = ws();
+    const locked = isLocked();
+    const stateName = new Map(w.states.map((s) => [s.key, s.name]));
+    const lensName = new Map(w.lenses.map((l) => [l.key, l.name]));
+    return h("div", { class: "q", id: `q-${q.qid}` },
+      h("div", { class: "q__meta" },
+        h("span", { class: "q__id" }, q.qid),
+        h("span", null, stateName.get(q.state) || q.state),
+        h("span", { class: "muted" }, lensName.get(q.lens) || q.lens),
+        h("label", { class: "small", for: `qp-${q.qid}` }, "Level ",
+          h("select", { id: `qp-${q.qid}`, disabled: locked, onchange: (e) => { q.pressure = parseInt(e.target.value, 10); unapprove(q); save(); render(); } },
+            [1, 2, 3].map((n) => h("option", { value: String(n), selected: q.pressure === n }, String(n)))))),
+      h("textarea", { id: `qt-${q.qid}`, rows: 3, disabled: locked, value: q.text, "aria-label": `${q.qid} text`,
+        oninput: (e) => { q.text = e.target.value; if (q.status === "APPROVED") { unapprove(q); syncQuestion(q); } touched(); } }),
+      h("div", { class: "q__actions" },
+        h("span", { id: `qs-${q.qid}` }, q.status === "APPROVED" ? pill("Approved", "ok") : pill("Draft", "draft")),
+        h("span", { id: `qb-${q.qid}`, class: "small muted" }, q.status === "APPROVED" ? q.approved_by : "TACTIK draft"),
+        h("button", { type: "button", class: "btn", id: `qa-${q.qid}`, disabled: locked || q.status === "APPROVED", onclick: () => approveQuestion(q) }, "Approve"),
+        h("button", { type: "button", class: "btn btn--danger", disabled: locked, onclick: () => { ui.rejecting = q.qid; render(); } }, "Reject")),
+      ui.rejecting === q.qid ? h("div", { class: "stack", style: "grid-column: 1 / -1" },
+        h("label", { class: "field", for: `qr-${q.qid}` }, h("span", null, "Why is this question rejected? The reason is recorded, because rejection reasons are pilot evidence (proposal p.19, RQ3)."),
+          h("textarea", { id: `qr-${q.qid}`, rows: 2 })),
+        h("div", { class: "row" },
+          h("button", { type: "button", class: "btn btn--danger", onclick: () => rejectQuestion(q, document.getElementById(`qr-${q.qid}`).value) }, "Reject and remove"),
+          h("button", { type: "button", class: "btn", onclick: () => { ui.rejecting = null; render(); } }, "Cancel"))) : null);
+  }
+  function unapprove(q) { q.status = "DRAFT"; q.approved_by = null; }
+  function syncQuestion(q) {
+    const s = document.getElementById(`qs-${q.qid}`);
+    if (s) s.replaceChildren(q.status === "APPROVED" ? pill("Approved", "ok") : pill("Draft", "draft"));
+    const b = document.getElementById(`qb-${q.qid}`);
+    if (b) b.textContent = q.status === "APPROVED" ? q.approved_by : "Edited, needs approval";
+    const a = document.getElementById(`qa-${q.qid}`);
+    if (a) a.disabled = isLocked() || q.status === "APPROVED";
+  }
+  function approveQuestion(q) {
+    if (needActor()) return;
+    if (!q.text.trim()) { ui.flash = { tone: "bad", text: `${q.qid} has no text to approve.` }; render(); return; }
+    q.status = "APPROVED";
+    q.approved_by = actor();
+    const w = ws();
+    record("question_approved", { webscript_id: w.webscript_id, version: w.version, qid: q.qid, text: q.text, approved_by: q.approved_by, at: now() });
+    render();
+  }
+  function rejectQuestion(q, reason) {
+    if (needActor()) return;
+    if (!reason.trim()) { ui.flash = { tone: "bad", text: "A rejection needs a reason. 'Rejected' with no reason is a blank, and a blank reads as agreement." }; render(); return; }
+    const w = ws();
+    record("question_rejected", { webscript_id: w.webscript_id, version: w.version, qid: q.qid, text: q.text, reason: reason.trim(), by: actor(), at: now() });
+    w.questions = w.questions.filter((x) => x.qid !== q.qid);
+    ui.rejecting = null;
+    ui.flash = { tone: "ok", text: `${q.qid} was removed and the reason is in the ledger.` };
+    save();
+    render();
+  }
+  function addQuestion() {
+    const w = ws();
+    const used = new Set(w.questions.map((q) => q.qid));
+    let n = w.questions.length + 1;
+    while (used.has(`Q${String(n).padStart(2, "0")}`)) n += 1;
+    w.questions.push({ qid: `Q${String(n).padStart(2, "0")}`, state: ui.newState || "opening", lens: (w.states.find((s) => s.key === (ui.newState || "opening")) || {}).owner || "chair",
+      pressure: 1, text: "", status: "DRAFT", approved_by: null });
+    save();
+    render();
+  }
+
+  function questionsView() {
+    const w = ws();
+    const lensStates = w.states.filter((s) => s.owner !== "system");
+    return h("div", { class: "stack" },
+      h("div", { class: "panel" }, w.questions.map(questionRow)),
+      isLocked() ? null : h("div", { class: "row" },
+        h("label", { class: "small", for: "new-state" }, "Add a question to ",
+          h("select", { id: "new-state", onchange: (e) => { ui.newState = e.target.value; } },
+            lensStates.map((s) => h("option", { value: s.key, selected: (ui.newState || "opening") === s.key }, s.name)))),
+        h("button", { type: "button", class: "btn", onclick: addQuestion }, "Add question")));
+  }
+
+  function rulesView() {
+    const w = ws();
+    const mandatory = new Set(S.MANDATORY_EVENTS);
+    return h("div", { class: "grid2" }, w.event_rules.map((r, i) => textField(`rule-${r.event}`,
+      `${EVENT_LABELS[r.event] || r.event}${mandatory.has(r.event) ? " · required" : " · optional"}`, r.response, (v) => { w.event_rules[i].response = v; touched(); })));
+  }
+
+  function stopsView() {
+    const w = ws();
+    return h("div", { class: "stack" },
+      h("ul", { class: "plain" }, w.stop_conditions.map((s) => h("li", null, s.text, " ", S.MANDATORY_STOPS.includes(s.key) ? pill("required", "") : pill("added by faculty", "ink")))),
+      isLocked() ? null : h("div", { class: "row" },
+        h("input", { type: "text", id: "new-stop", placeholder: "Add a stop condition (faculty may add, never remove)", "aria-label": "New stop condition", style: "flex: 1 1 18rem" }),
+        h("button", { type: "button", class: "btn", onclick: () => {
+          const v = document.getElementById("new-stop").value.trim();
+          if (!v) return;
+          w.stop_conditions.push({ key: `faculty_${w.stop_conditions.length + 1}`, text: v });
+          save(); render();
+        } }, "Add")));
+  }
+
+  function visibilityView() {
+    const v = ws().visibility;
+    return h("div", { class: "grid2" },
+      h("div", { class: "panel" }, h("h3", null, "Candidate sees"), h("ul", { class: "plain small" }, v.student.map((x) => h("li", null, x)))),
+      h("div", { class: "panel" }, h("h3", null, "Faculty see"), h("ul", { class: "plain small" }, v.faculty.map((x) => h("li", null, x)))));
+  }
+
+  function rubricHead() {
+    const r = ws().rubric;
+    const total = r.criteria.reduce((s, c) => s + c.weight_bp, 0);
+    return h("div", { class: "row", id: "rubric-head" },
+      r.status === "APPROVED" ? pill(`Approved · ${r.approved_by}`, "ok") : pill("Draft", "draft"),
+      h("span", { class: `small ${total === S.WEIGHT_TOTAL_BP ? "muted" : ""}`, style: total === S.WEIGHT_TOTAL_BP ? null : "color: var(--crimson)" },
+        `Weights total ${total} basis points (${pct(total)})${total === S.WEIGHT_TOTAL_BP ? "" : `; must total ${S.WEIGHT_TOTAL_BP}`}`),
+      h("button", { type: "button", class: "btn", disabled: isLocked() || r.status === "APPROVED", onclick: approveRubric }, "Approve rubric"));
+  }
+  function rubricTouched() {
+    const r = ws().rubric;
+    if (r.status === "APPROVED") { r.status = "DRAFT"; r.approved_by = null; }
+    const old = document.getElementById("rubric-head");
+    if (old) old.replaceWith(rubricHead());
+    touched();
+  }
+  function approveRubric() {
+    if (needActor()) return;
+    const r = ws().rubric;
+    const problems = S.lockBlockers(ws()).filter((b) => b.code === "RUBRIC_WEIGHTS" || b.code === "RUBRIC_ANCHOR_BLANK");
+    if (problems.length) { ui.flash = { tone: "bad", text: `The rubric cannot be approved yet: ${problems.map((p) => p.detail).join("; ")}.` }; render(); return; }
+    r.status = "APPROVED";
+    r.approved_by = actor();
+    record("rubric_approved", { webscript_id: ws().webscript_id, version: ws().version, weight_use: r.weight_use, criteria_seal: S.digest(r.criteria), approved_by: r.approved_by, at: now() });
+    render();
+  }
+
+  function rubricView() {
+    const r = ws().rubric;
+    const locked = isLocked();
+    return h("div", { class: "stack" },
+      rubricHead(),
+      h("fieldset", { class: "panel", style: "margin: 0" },
+        h("legend", { class: "small muted" }, "What the weights may do (sealed with the script)"),
+        h("label", { class: "row small", for: "wu-prio" },
+          h("input", { type: "radio", name: "weight-use", id: "wu-prio", disabled: locked, checked: r.weight_use === "prioritization",
+            onchange: () => { r.weight_use = "prioritization"; rubricTouched(); } }),
+          h("span", null, h("strong", null, "Prioritization only. "), "Weights order the criteria in the readiness view. No combined figure is ever produced.")),
+        h("label", { class: "row small", for: "wu-comp" },
+          h("input", { type: "radio", name: "weight-use", id: "wu-comp", disabled: locked, checked: r.weight_use === "composite",
+            onchange: () => { r.weight_use = "composite"; rubricTouched(); } }),
+          h("span", null, h("strong", null, "Composite permitted. "), "A combined figure still requires a calibration attestation naming who says the levels are comparable. The proposal says “never a single academic grade” (p.8)."))),
+      h("div", { class: "tablewrap" }, h("table", null,
+        h("thead", null, h("tr", null, h("th", null, "Criterion"), h("th", null, "Observable evidence"), h("th", { class: "num" }, "Weight (bp)"), h("th", null, "Level anchors 0–3"))),
+        h("tbody", null, r.criteria.map((c) => h("tr", null,
+          h("td", null, h("strong", null, c.name)),
+          h("td", null, c.evidence),
+          h("td", { class: "num" },
+            h("input", { type: "number", id: `w-${c.key}`, min: "0", max: "10000", step: "50", disabled: locked, value: String(c.weight_bp), style: "width: 6.5rem", "aria-label": `${c.name} weight in basis points`,
+              oninput: (e) => { const n = parseInt(e.target.value, 10); c.weight_bp = Number.isFinite(n) ? Math.max(0, Math.min(S.WEIGHT_TOTAL_BP, n)) : 0; rubricTouched(); } }),
+            h("div", { class: "small muted" }, pct(c.weight_bp))),
+          h("td", null, h("details", null, h("summary", { class: "small" }, "Edit anchors"),
+            h("div", { class: "stack", style: "margin-top: 0.5rem" }, c.anchors.map((a, i) =>
+              h("label", { class: "field", for: `a-${c.key}-${i}` }, h("span", null, `${i} · ${LEVEL_NAMES[i]}`),
+                h("textarea", { id: `a-${c.key}-${i}`, rows: 2, disabled: locked, value: a, oninput: (e) => { c.anchors[i] = e.target.value; rubricTouched(); } }))))))))))));
+  }
+
+  function profileView() {
+    const p = ws().profile;
+    const locked = isLocked();
+    const change = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
+    const intensityText = () => `Changes: the session starts at pressure level ${S.startingPressure(p)}.`;
+    const strictText = () => (S.escalatesOnConfidence(p)
+      ? "Changes: a confident claim with no cited evidence raises pressure one level."
+      : "Changes: a confident claim with no cited evidence is noted, and pressure does not rise.");
+    return h("div", { class: "grid2" },
+      h("div", { class: "panel" },
+        h("label", { class: "field", for: "pf-intensity" }, h("span", null, "Challenge intensity: ", h("strong", { id: "pf-intensity-v" }, String(p.challenge_intensity))),
+          h("input", { type: "range", id: "pf-intensity", min: "0", max: "100", disabled: locked, value: String(p.challenge_intensity),
+            oninput: (e) => { p.challenge_intensity = parseInt(e.target.value, 10); change("pf-intensity-v", p.challenge_intensity); change("pf-intensity-c", intensityText()); touched(); } })),
+        h("p", { class: "small muted", id: "pf-intensity-c" }, intensityText())),
+      h("div", { class: "panel" },
+        h("label", { class: "field", for: "pf-strict" }, h("span", null, "Evidence strictness: ", h("strong", { id: "pf-strict-v" }, String(p.evidence_strictness))),
+          h("input", { type: "range", id: "pf-strict", min: "0", max: "100", disabled: locked, value: String(p.evidence_strictness),
+            oninput: (e) => { p.evidence_strictness = parseInt(e.target.value, 10); change("pf-strict-v", p.evidence_strictness); change("pf-strict-c", strictText()); touched(); } })),
+        h("p", { class: "small muted", id: "pf-strict-c" }, strictText())),
+      h("div", { class: "panel" },
+        h("label", { class: "field", for: "pf-evasions" }, h("span", null, "Evasions before reframing"),
+          h("select", { id: "pf-evasions", disabled: locked, onchange: (e) => { p.evasions_before_reframe = parseInt(e.target.value, 10); touched(); render(); } },
+            [1, 2, 3].map((n) => h("option", { value: String(n), selected: p.evasions_before_reframe === n }, String(n))))),
+        h("p", { class: "small muted" }, `Changes: after ${p.evasions_before_reframe} evasion${p.evasions_before_reframe === 1 ? "" : "s"}, the question is reframed once and the objection recorded as open.`)),
+      h("div", { class: "panel" },
+        h("label", { class: "field", for: "pf-format" }, h("span", null, "Participation format"),
+          h("select", { id: "pf-format", disabled: locked, onchange: (e) => { p.format = e.target.value; touched(); } },
+            [["cold_call", "Cold call"], ["seminar", "Seminar"], ["presentation", "Presentation"]].map(([v, l]) => h("option", { value: v, selected: p.format === v }, l)))),
+        h("p", { class: "small muted" }, "Changes: nothing in this preview yet. Recorded and sealed for the design session.")));
+  }
+
+  function viewWebscript() {
+    const w = ws();
+    const approved = w.questions.filter((q) => q.status === "APPROVED").length;
+    return h("div", { class: "view" },
+      vhead(`${w.course.code} · ${w.course.institution}`, w.course.title,
+        "The rehearsal script faculty approve and version-lock before any candidate sees it. TACTIK drafted it from the DBA template; every question, level and anchor is yours to approve, change or reject. Only approved questions ever reach a candidate."),
+      flashBox(),
+      statusCard(),
+      section("Learning objective", "Sealed with the script. Without a floor, any outcome clears the bar afterwards.", objectiveView()),
+      section("Dossier", "Fictional mixed-methods dissertation. No student, committee, employer or participant record.", dossierView()),
+      section("Committee lenses", "Each lens is a job and a boundary. None is a person, and none is named after one.", lensesView()),
+      section("Controlled states", "Orientation and debrief bound the session, so it cannot wander into open-ended tutoring.", statesView()),
+      section("Pressure levels", "The proposal names three levels and never defines them. What each level means is faculty content, so the lock waits for you.", pressureView()),
+      section("Question bank", `${approved} of ${w.questions.length} approved. Editing an approved question returns it to draft.`, questionsView()),
+      section("Event rules", "What happens when the candidate overclaims, evades, self-corrects or asks for an answer. Reword freely; the five required rules cannot be removed.", rulesView()),
+      section("Stop conditions", "Any one of these stops a session. A stopped session gets NO_SCORE, which is not a low score.", stopsView()),
+      section("Visibility", null, visibilityView()),
+      section("Readiness rubric", "Criterion-level, never a single grade. Weights are basis points: 25% is 2500.", rubricView()),
+      section("Teaching profile", "A parameter set derived from course materials, not a person. Each setting says what it changes.", profileView()));
+  }
+
+  // ---------- Trigger lab ----------
+  function viewTriggers() {
+    const design = ws().dossier.design;
+    const d = derive();
+    const results = S.TRIGGER_FIXTURES.map((f) => {
+      const detected = S.detect(f.text, { design });
+      const fp = detected.filter((e) => !f.expected.includes(e));
+      const fn = f.expected.filter((e) => !detected.includes(e));
+      return Object.assign({}, f, { detected, fp, fn, match: !fp.length && !fn.length });
+    });
+    const pairs = S.fairness(design);
+    const matches = results.filter((r) => r.match).length;
+    const fpCount = results.reduce((s, r) => s + r.fp.length, 0);
+    const fnCount = results.reduce((s, r) => s + r.fn.length, 0);
+    const breaches = pairs.filter((p) => p.breach).length;
+    const reviewed = results.filter((r) => d.reviews.has(r.id)).length;
+    const tag = (events, tone) => (events.length ? events.map((e) => pill(EVENT_LABELS[e] || e, tone)) : [h("span", { class: "small muted" }, "none")]);
+
+    return h("div", { class: "view" },
+      vhead("Faculty red team · proposal p.21–22", "Trigger lab",
+        "These are the rules the preview uses to notice overclaims, evasions and requests for answers. They are deliberately simple, and they fail in ways you can see. The production classifier is still pending (proposal p.3); whatever replaces these rules has to pass the same fixtures."),
+      flashBox(),
+      h("div", { class: "stats" },
+        h("div", { class: "stat" }, h("span", { class: "stat__n" }, `${matches} of ${results.length}`), h("span", { class: "stat__l" }, "fixtures detected as intended")),
+        h("div", { class: "stat" }, h("span", { class: "stat__n" }, String(fpCount)), h("span", { class: "stat__l" }, "false alarms")),
+        h("div", { class: "stat" }, h("span", { class: "stat__n" }, String(fnCount)), h("span", { class: "stat__l" }, "misses")),
+        h("div", { class: "stat" }, h("span", { class: "stat__n", style: breaches ? "color: var(--crimson)" : null }, `${breaches} of ${pairs.length}`), h("span", { class: "stat__l" }, "style pairs breach the boundary")),
+        h("div", { class: "stat" }, h("span", { class: "stat__n" }, `${reviewed} of ${results.length}`), h("span", { class: "stat__l" }, "reviewed by faculty"))),
+      section("The fairness boundary", "Proposal p.3: “Pressure changes only because of the evidence, claim, or unresolved objection, never because a student is slow, nervous, accented, or stylistically different.” Each pair says the same thing in two styles. If the rules react differently, pressure would change because of style.",
+        h("div", { class: "stack" }, pairs.map((p) => h("div", { class: "panel" },
+          h("div", { class: "row" }, h("h3", null, `${p.id} · ${p.axis}`), p.breach ? pill("Boundary breach", "bad") : pill("Same pressure", "ok")),
+          h("div", { class: "grid2" },
+            h("div", { class: "stack" }, h("p", null, `“${p.a}”`), h("div", { class: "row" }, tag(p.triggersA, ""))),
+            h("div", { class: "stack" }, h("p", null, `“${p.b}”`), h("div", { class: "row" }, tag(p.triggersB, "")))),
+          p.breach ? h("p", { class: "small", style: "color: var(--crimson)" },
+            "The reasoning is the same and the triggers differ, so pressure would differ for style alone. Under the falsification charter (p.20), this is a reason not to run these rules on real candidates.") : null)))),
+      section("Fixtures", "Each line is a fictional candidate turn with the behavior TACTIK intended. Mark whether the trigger behaves as you would want. Your verdicts go to the ledger as red-team evidence.",
+        h("div", { class: "stack" }, results.map((r) => {
+          const review = d.reviews.get(r.id);
+          return h("div", { class: "panel" },
+            h("div", { class: "row" }, h("span", { class: "q__id" }, r.id), r.match ? pill("As intended", "ok") : pill(r.fn.length ? "Miss" : "False alarm", "bad"),
+              review ? pill(review.verdict === "behaves_as_intended" ? `Faculty: as intended` : `Faculty: needs revision`, review.verdict === "behaves_as_intended" ? "ok" : "draft") : null),
+            h("p", null, `“${r.text}”`),
+            h("dl", { class: "kv" },
+              h("dt", null, "Intended"), h("dd", null, h("div", { class: "row" }, tag(r.expected, ""))),
+              h("dt", null, "Detected"), h("dd", null, h("div", { class: "row" }, tag(r.detected, r.match ? "" : "bad")))),
+            review && review.note ? h("p", { class: "small muted" }, `Note: ${review.note} (${review.by})`) : null,
+            h("div", { class: "row" },
+              h("input", { type: "text", id: `rv-${r.id}`, placeholder: "Optional note", "aria-label": `Note for ${r.id}`, style: "flex: 1 1 14rem" }),
+              h("button", { type: "button", class: "btn", onclick: () => reviewTrigger(r, "behaves_as_intended") }, "Behaves as intended"),
+              h("button", { type: "button", class: "btn", onclick: () => reviewTrigger(r, "needs_revision") }, "Needs revision")));
+        }))),
+      section("The rules, disclosed", "Proposal p.22 promises to disclose the heuristic and validate every trigger with faculty. Here it is in full.",
+        h("div", { class: "tablewrap" }, h("table", null,
+          h("thead", null, h("tr", null, h("th", null, "Event"), h("th", null, "Fires on"))),
+          h("tbody", null,
+            S.DETECTORS.map((det) => h("tr", null, h("td", null, det.label), h("td", null, det.rule))),
+            h("tr", null, h("td", null, "Evidence marker"), h("td", null, S.EVIDENCE_RULE)))))));
+  }
+  function reviewTrigger(r, verdict) {
+    if (needActor()) return;
+    const note = (document.getElementById(`rv-${r.id}`) || {}).value || "";
+    record("trigger_reviewed", { fixture: r.id, text: r.text, expected: r.expected, detected: r.detected, verdict, note: note.trim(), by: actor(), at: now() });
+    render();
+  }
+
+  // ---------- Dry run ----------
+  function viewDryRun() {
+    const w = ws();
+    const run = S.runDryRun(w, S.DRY_RUN_SCRIPT);
+    const p = w.profile;
+    const counts = Object.entries(run.counts);
+    return h("div", { class: "view" },
+      vhead("Preview · the seven-minute defense", "Dry run",
+        "What a candidate would experience under this Webscript, with a scripted fictional candidate. Only approved questions are asked. Rules are shown as instructions, because the production engine that phrases them is not built yet. Change a question's approval or the teaching profile and this run changes."),
+      flashBox(),
+      h("div", { class: "row" },
+        pill(`starts at level ${run.startPressure}`, "ink"),
+        pill(S.escalatesOnConfidence(p) ? "escalates on confident claims" : "no escalation on confidence", ""),
+        pill(`reframes after ${p.evasions_before_reframe}`, ""),
+        pill(isLocked() ? `locked v${w.version}` : `draft v${w.version}`, isLocked() ? "ok" : "draft")),
+      h("div", { class: "split" },
+        h("div", { class: "panel" }, run.steps.map((s) => {
+          if (s.kind === "state") return h("div", { class: "state-head" }, h("h3", null, s.name), h("span", { class: "small muted" }, `Exit: ${s.exit}`));
+          const cls = s.kind === "candidate" ? "turn turn--candidate" : s.kind === "rule" || s.kind === "note" ? "turn turn--rule" : s.kind === "blocked" ? "turn turn--blocked" : "turn";
+          return h("div", { class: cls },
+            h("div", { class: "turn__who" }, s.speaker, s.kind === "ask" ? h("div", { class: "mono" }, `${s.qid} · level ${s.level}`) : null),
+            h("div", { class: "stack" },
+              h("div", { class: "turn__text" }, s.text),
+              s.note ? h("p", { class: "small", style: "color: var(--amber)" }, s.note) : null,
+              s.events && s.events.length ? h("div", { class: "row" }, s.events.map((e) => pill(EVENT_LABELS[e] || e, "draft"))) : null,
+              s.suppressed && s.suppressed.length ? h("p", { class: "small muted" }, `Suppressed: ${s.suppressed.map((e) => EVENT_LABELS[e]).join(", ")}. A restatement quotes the claim it retracts; the restatement rule takes precedence.`) : null));
+        })),
+        h("div", { class: "stack" },
+          h("div", { class: "panel" }, h("h3", null, "Claims kept in both versions"),
+            run.preserved.length ? run.preserved.map((pr) => h("div", { class: "stack small" },
+              h("p", null, h("span", { class: "muted" }, "Original: "), pr.original),
+              h("p", null, h("span", { class: "muted" }, "Revised: "), pr.revised))) : h("p", { class: "small muted" }, "None in this run.")),
+          h("div", { class: "panel" }, h("h3", null, "Open objections"),
+            run.openObjections.length ? h("ul", { class: "plain small" }, run.openObjections.map((o) => h("li", null, `${o.qid} in ${o.state}`))) : h("p", { class: "small muted" }, "None.")),
+          h("div", { class: "panel" }, h("h3", null, "Events"),
+            counts.length ? h("ul", { class: "plain small" }, counts.map(([e, n]) => h("li", null, `${EVENT_LABELS[e] || e}: ${n}`))) : h("p", { class: "small muted" }, "None."),
+            h("p", { class: "small muted" }, `Pressure ended at level ${run.finalPressure}. No grade was produced.`)),
+          h("button", { type: "button", class: "btn btn--primary", onclick: () => {
+            if (needActor()) return;
+            record("dry_run_reviewed", { webscript_id: w.webscript_id, version: w.version, script_seal: S.digest(w), preserved: run.preserved.length,
+              open_objections: run.openObjections.length, events: run.counts, final_pressure: run.finalPressure, by: actor(), at: now() });
+            ui.flash = { tone: "ok", text: "This dry run is recorded against the current script seal." };
+            render();
+          } }, "Record as red-team evidence"))));
+  }
+
+  // ---------- Readiness ----------
+  function viewReadiness() {
+    const w = ws();
+    const d = derive();
+    const r = w.rubric;
+    const criteria = r.weight_use === "prioritization" ? r.criteria.slice().sort((a, b) => b.weight_bp - a.weight_bp) : r.criteria;
+    const sessions = [...d.sessions.values()];
+    const measured = sessions.filter((s) => s.status !== "stopped");
+    const stopped = sessions.filter((s) => s.status === "stopped");
+    const causal = measured.filter((s) => (s.events.causal_language || 0) > 0);
+    const restated = causal.filter((s) => (s.events.restated || 0) > 0);
+    const openObj = measured.reduce((n, s) => n + (s.events.open_objections || 0), 0);
+    const withOpen = measured.filter((s) => (s.events.open_objections || 0) > 0).length;
+    const lowLimits = measured.filter((s) => { const o = d.obs.get(`${s.session}|limits`); return o && o.level !== S.UNDETERMINED && o.level <= 1; }).length;
+    const undetermined = measured.flatMap((s) => criteria.map((c) => d.obs.get(`${s.session}|${c.key}`)).filter((o) => o && o.level === S.UNDETERMINED));
+
+    const cell = (s, c) => {
+      const o = d.obs.get(`${s.session}|${c.key}`);
+      if (!o) return h("span", { class: "small muted" }, "not yet observed");
+      const key = `${s.session}|${c.key}`;
+      const und = o.level === S.UNDETERMINED;
+      return h("button", { type: "button", class: `cell ${und ? "cell--und" : `lvl-${o.level}`}`, "aria-pressed": ui.selected === key ? "true" : "false",
+        onclick: () => { ui.selected = ui.selected === key ? null : key; render(); } },
+        h("span", { class: "cell__lvl" }, und ? "Undetermined" : `${o.level} · ${LEVEL_NAMES[o.level]}`),
+        o.overrides.length ? h("span", { class: "small muted" }, "overridden") : null);
+    };
+
+    return h("div", { class: "view" },
+      vhead("Faculty readiness view · synthetic cohort", "Readiness",
+        "Criterion by criterion, with the evidence behind each level. These six candidates are fictional red-team sessions run against the draft script. There is no total and no grade. A stopped session shows NO_SCORE, which means nothing was measured."),
+      flashBox(),
+      h("div", { class: "stats" },
+        h("div", { class: "stat" }, h("span", { class: "stat__n" }, String(sessions.length)), h("span", { class: "stat__l" }, "synthetic candidates")),
+        h("div", { class: "stat" }, h("span", { class: "stat__n" }, String(measured.length)), h("span", { class: "stat__l" }, "with observations")),
+        h("div", { class: "stat" }, h("span", { class: "stat__n" }, String(stopped.length)), h("span", { class: "stat__l" }, "stopped, NO_SCORE")),
+        h("div", { class: "stat" }, h("span", { class: "stat__n" }, String(undetermined.length)), h("span", { class: "stat__l" }, "criteria undetermined, with reasons"))),
+      h("div", { class: "tablewrap" }, h("table", null,
+        h("thead", null, h("tr", null, h("th", null, "Candidate"),
+          criteria.map((c) => h("th", null, c.name, h("div", { style: "font-weight: 400; text-transform: none; letter-spacing: 0" }, r.weight_use === "prioritization" ? `priority ${pct(c.weight_bp)}` : pct(c.weight_bp)))),
+          h("th", null, "Alerts"))),
+        h("tbody", null, sessions.map((s) => h("tr", null,
+          h("td", null, h("strong", null, s.candidate), h("div", { class: "small muted" }, `${s.session} · ${s.status}`)),
+          s.status === "stopped"
+            ? h("td", { colspan: String(criteria.length), class: "noscore" }, `NO_SCORE. Session stopped: ${conditionText(s.condition)}. Not a low score: no measurement exists.`)
+            : criteria.map((c) => h("td", null, cell(s, c))),
+          h("td", { class: "small", style: "min-width: 12rem" },
+            (s.events.causal_language || 0) ? h("div", null, `Causal language ×${s.events.causal_language}${s.events.restated ? `, restated ${s.events.restated}` : ", never restated"}`) : null,
+            (s.events.open_objections || 0) ? h("div", null, `${s.events.open_objections} open objection${s.events.open_objections === 1 ? "" : "s"}`) : null,
+            !(s.events.causal_language || s.events.open_objections) ? h("span", { class: "muted" }, "none") : null)))))),
+      ui.selected ? detailPanel(d) : h("p", { class: "small muted" }, "Select a cell to see its evidence, override it, or erase the candidate's text."),
+      h("div", { class: "row" },
+        h("button", { type: "button", class: "btn", onclick: () => { ui.composite = !ui.composite; render(); } }, "Combine criteria into one score")),
+      ui.composite ? compositeRefusal(r) : null,
+      section("Cohort patterns", `Counted across the ${measured.length} sessions with observations. Stopped sessions are excluded, not zeroed.`,
+        h("div", { class: "tablewrap" }, h("table", null,
+          h("thead", null, h("tr", null, h("th", null, "Pattern"), h("th", { class: "num" }, "Count"))),
+          h("tbody", null,
+            h("tr", null, h("td", null, "Used causal language about the cross-sectional result"), h("td", { class: "num" }, `${causal.length} of ${measured.length}`)),
+            h("tr", null, h("td", null, "Restated after the interruption"), h("td", { class: "num" }, `${restated.length} of ${causal.length}`)),
+            h("tr", null, h("td", null, "Ended with at least one open objection"), h("td", { class: "num" }, `${withOpen} of ${measured.length} (${openObj} objections)`)),
+            h("tr", null, h("td", null, "Limitations at level 1 or below"), h("td", { class: "num" }, `${lowLimits} of ${measured.length}`)))))),
+      section("Teaching actions", "TACTIK drafts these from the patterns. Nothing reaches a student unless you adopt it. Adopted and rejected actions both count: faculty action yield is a pilot metric (p.21), and rejection reasons are evidence (RQ3).",
+        h("div", { class: "stack" }, S.TEACHING_DRAFTS.map((t) => teachingRow(t, d.teaching.get(t.id))))));
+  }
+  function conditionText(key) {
+    const s = ws().stop_conditions.find((x) => x.key === key);
+    return s ? s.text.replace(/\.$/, "").toLowerCase() : key;
+  }
+  function compositeRefusal(r) {
+    const prio = r.weight_use !== "composite";
+    return h("div", { class: "refusal", role: "alert" },
+      h("div", { class: "refusal__title" }, "Refused"),
+      h("p", null, prio
+        ? "This rubric declares its weights for prioritization only. Readiness is reported criterion by criterion. A combined figure needs a new Webscript version whose sealed rubric says otherwise."
+        : "Criteria cannot be combined into one figure before a calibration attestation names who says the levels are comparable across criteria, how they established it, and on which reference runs."),
+      h("p", { class: "small muted" }, "The same gate in code: tactik_eval.edu.ReadinessCard.composite() raises PrematureCollapse. The studio never computes a composite itself."));
+  }
+  function teachingRow(t, decision) {
+    const id = `ta-${t.id}`;
+    return h("div", { class: "panel" },
+      h("div", { class: "row" }, h("span", { class: "q__id" }, t.id),
+        decision ? pill(decision.decision === "adopted" ? `Adopted · ${decision.by}` : `Rejected · ${decision.by}`, decision.decision === "adopted" ? "ok" : "bad") : pill("TACTIK draft", "draft")),
+      decision
+        ? h("div", { class: "stack" }, h("p", null, decision.text), decision.reason ? h("p", { class: "small muted" }, `Reason: ${decision.reason}`) : null)
+        : h("div", { class: "stack" },
+          h("textarea", { id, rows: 2, value: t.text, "aria-label": `Teaching action ${t.id}` }),
+          h("div", { class: "row" },
+            h("input", { type: "text", id: `${id}-why`, placeholder: "Reason (required to reject)", "aria-label": `Reason for ${t.id}`, style: "flex: 1 1 14rem" }),
+            h("button", { type: "button", class: "btn btn--primary", onclick: () => decideTeaching(t, "adopted") }, "Adopt"),
+            h("button", { type: "button", class: "btn btn--danger", onclick: () => decideTeaching(t, "rejected") }, "Reject"))));
+  }
+  function decideTeaching(t, decision) {
+    if (needActor()) return;
+    const text = document.getElementById(`ta-${t.id}`).value.trim();
+    const reason = document.getElementById(`ta-${t.id}-why`).value.trim();
+    if (decision === "rejected" && !reason) { ui.flash = { tone: "bad", text: "A rejection needs a reason. Non-use and its reasons are what RQ3 measures." }; render(); return; }
+    record("teaching_action", { draft_id: t.id, decision, text: text || t.text, edited: (text || t.text) !== t.text, reason, by: actor(), at: now() });
+    render();
+  }
+
+  function detailPanel(d) {
+    const o = d.obs.get(ui.selected);
+    if (!o) return null;
+    const c = ws().rubric.criteria.find((x) => x.key === o.criterion);
+    const note = contentText(o.note_ref, d.erased);
+    const und = o.level === S.UNDETERMINED;
+    const refs = [o.note_ref, ...o.overrides.map((x) => x.reason_ref)].filter(Boolean);
+    const anyStored = refs.some((ref) => contentText(ref, d.erased) !== null);
+    return h("div", { class: "panel", id: "detail" },
+      h("div", { class: "row" }, h("h3", null, `${o.candidate} · ${c ? c.name : o.criterion}`),
+        und ? pill("Undetermined", "") : pill(`Level ${o.level} · ${LEVEL_NAMES[o.level]}`, o.level >= 2 ? "ok" : o.level === 1 ? "draft" : "bad")),
+      !und && c ? h("p", { class: "small muted" }, `Anchor: ${c.anchors[o.level]}`) : null,
+      h("dl", { class: "kv" },
+        h("dt", null, und ? "What is unresolved" : "Evidence"), h("dd", null, note === null ? h("span", { class: "muted" }, "[text erased; the ledger entry and its hash remain]") : note),
+        h("dt", null, "Recorded by"), h("dd", null, `${o.rater}, ledger entry ${o.index}`),
+        o.overrides.length ? [h("dt", null, "Original level"), h("dd", null, o.original === S.UNDETERMINED ? "Undetermined" : String(o.original))] : null),
+      o.overrides.length ? h("div", { class: "stack small" }, h("strong", null, "Overrides, oldest first"),
+        o.overrides.map((x) => h("p", null, `${x.from === S.UNDETERMINED ? "Undetermined" : x.from} → ${x.to === S.UNDETERMINED ? "Undetermined" : x.to} by ${x.by}: `,
+          contentText(x.reason_ref, d.erased) ?? h("span", { class: "muted" }, "[reason erased]"), ` (entry ${x.index})`))) : null,
+      h("div", { class: "grid2" },
+        h("label", { class: "field", for: "ov-level" }, h("span", null, "Override to"),
+          h("select", { id: "ov-level" },
+            [0, 1, 2, 3].map((n) => h("option", { value: String(n) }, `${n} · ${LEVEL_NAMES[n]}`)),
+            h("option", { value: S.UNDETERMINED }, "Undetermined"))),
+        h("label", { class: "field", for: "ov-reason" }, h("span", null, "Reason (required)"), h("textarea", { id: "ov-reason", rows: 2 }))),
+      h("div", { class: "row" },
+        h("button", { type: "button", class: "btn btn--primary", onclick: () => overrideObservation(o) }, "Record override"),
+        anyStored
+          ? (ui.eraseConfirm === ui.selected
+            ? [h("span", { class: "small", style: "color: var(--crimson)" }, "Erase this text permanently from this browser? The ledger keeps the hash and records the erasure."),
+              h("button", { type: "button", class: "btn btn--danger", onclick: () => eraseRefs(refs) }, "Erase"),
+              h("button", { type: "button", class: "btn", onclick: () => { ui.eraseConfirm = null; render(); } }, "Keep")]
+            : h("button", { type: "button", class: "btn btn--danger", onclick: () => { ui.eraseConfirm = ui.selected; render(); } }, "Erase candidate text"))
+          : null),
+      h("p", { class: "small muted" }, "An override adds an entry. The original level stays in the ledger, so disagreement between rater and faculty is preserved, as the measurement plan requires (p.19)."));
+  }
+  function overrideObservation(o) {
+    if (needActor()) return;
+    const raw = document.getElementById("ov-level").value;
+    const to = raw === S.UNDETERMINED ? S.UNDETERMINED : parseInt(raw, 10);
+    const reason = document.getElementById("ov-reason").value.trim();
+    if (!reason) { ui.flash = { tone: "bad", text: "An override needs a reason. Without one it cannot be told apart from a slip." }; render(); return; }
+    if (to === o.level) { ui.flash = { tone: "bad", text: "That is already the current level. Nothing to override." }; render(); return; }
+    record("observation_overridden", { session: o.session, candidate: o.candidate, criterion: o.criterion, supersedes: o.hash, from: o.level, to,
+      reason_ref: S.storeContent(state.content, reason), by: actor(), at: now() });
+    ui.flash = { tone: "ok", text: `Override recorded for ${o.candidate}. The original stays in the ledger.` };
+    render();
+  }
+  function eraseRefs(refs) {
+    if (needActor()) return;
+    const erased = derive().erased;
+    for (const ref of refs) {
+      if (!state.content[ref] || erased.has(ref)) continue;
+      delete state.content[ref];
+      record("content_erased", { content_ref: ref, reason: "deletion requested (demo)", by: actor(), at: now() });
+    }
+    ui.eraseConfirm = null;
+    ui.flash = { tone: "ok", text: "The text and its salt are gone from this browser. The chain still verifies; the hash alone cannot recover the text." };
+    render();
+  }
+
+  // ---------- Controls ----------
+  function viewControls() {
+    const d = derive();
+    const sessions = [...d.sessions.values()];
+    const stops = ws().stop_conditions;
+    const statusPill = (s) => ({ open: pill("Running", "ink"), paused: pill("Paused", "draft"), stopped: pill("Stopped · NO_SCORE", "bad"), completed: pill("Completed", "ok") })[s.status];
+    const types = [["adverse_event", "Adverse event"], ["non_use", "Non-use"], ["rejection", "Rejection of the tool"], ["burden", "Faculty burden"]];
+    return h("div", { class: "view" },
+      vhead("Pause · stop · falsification charter", "Controls",
+        "Faculty can pause or stop any rehearsal, before or during use (proposal p.13). A stop names its condition and voids the session: NO_SCORE, not a low score. The pilot must be allowed to fail, so failures get recorded here, not explained away."),
+      flashBox(),
+      h("div", { class: "row" },
+        h("button", { type: "button", class: "btn", onclick: () => {
+          if (needActor()) return;
+          const running = sessions.filter((s) => s.status === "open");
+          running.forEach((s) => record("session_paused", { session: s.session, candidate: s.candidate, scope: "all running sessions", by: actor(), at: now() }));
+          ui.flash = { tone: "ok", text: running.length ? `Paused ${running.length} running session${running.length === 1 ? "" : "s"}.` : "No session is running." };
+          render();
+        } }, "Pause every running session")),
+      h("div", { class: "tablewrap" }, h("table", null,
+        h("thead", null, h("tr", null, h("th", null, "Session"), h("th", null, "Status"), h("th", null, "Control"))),
+        h("tbody", null, sessions.map((s) => h("tr", null,
+          h("td", null, h("strong", null, s.session), h("div", { class: "small muted" }, s.candidate)),
+          h("td", null, statusPill(s), s.condition ? h("div", { class: "small muted" }, conditionText(s.condition)) : null),
+          h("td", null, s.status === "open" || s.status === "paused" ? h("div", { class: "row" },
+            s.status === "open"
+              ? h("button", { type: "button", class: "btn", onclick: () => sessionAct(s, "session_paused") }, "Pause")
+              : h("button", { type: "button", class: "btn", onclick: () => sessionAct(s, "session_resumed") }, "Resume"),
+            h("select", { id: `stop-${s.session}`, "aria-label": `Stop condition for ${s.session}` }, stops.map((c) => h("option", { value: c.key }, c.text))),
+            h("button", { type: "button", class: "btn btn--danger", onclick: () => stopSession(s) }, "Stop")) : h("span", { class: "small muted" }, "no action"))))))),
+      section("Falsification charter log", "Proposal p.20: do not scale if gains are indistinguishable from coaching, reliability is inadequate, faculty burden exceeds value, students generate assessed work with it, transfer does not appear, or privacy, accessibility, fairness and pause controls cannot be sustained. Record what would count against the pilot.",
+        h("div", { class: "grid2" },
+          h("label", { class: "field", for: "ch-type" }, h("span", null, "Type"), h("select", { id: "ch-type" }, types.map(([v, l]) => h("option", { value: v }, l)))),
+          h("label", { class: "field", for: "ch-text" }, h("span", null, "What happened"), h("textarea", { id: "ch-text", rows: 2 }))),
+        h("div", { class: "row" }, h("button", { type: "button", class: "btn btn--primary", onclick: () => {
+          if (needActor()) return;
+          const text = document.getElementById("ch-text").value.trim();
+          if (!text) { ui.flash = { tone: "bad", text: "Describe what happened. An empty report is a blank, and a blank reads as nothing went wrong." }; render(); return; }
+          record("charter_event", { type: document.getElementById("ch-type").value, description: text, by: actor(), at: now() });
+          render();
+        } }, "Record")),
+        d.charter.length
+          ? h("ul", { class: "plain" }, d.charter.map((c) => h("li", null, pill((types.find((t) => t[0] === c.type) || [0, c.type])[1], "draft"), " ", c.description, h("span", { class: "small muted" }, ` · ${c.by}, entry ${c.index}`))))
+          : h("p", { class: "small muted" }, "Nothing recorded yet. That is a finding only if someone looked; record what you checked.")));
+  }
+  function sessionAct(s, kind) {
+    if (needActor()) return;
+    record(kind, { session: s.session, candidate: s.candidate, by: actor(), at: now() });
+    render();
+  }
+  function stopSession(s) {
+    if (needActor()) return;
+    const condition = document.getElementById(`stop-${s.session}`).value;
+    record("session_stopped", { session: s.session, candidate: s.candidate, condition, by: actor(), result: "NO_SCORE", at: now() });
+    ui.flash = { tone: "ok", text: `${s.session} is stopped. Its observations are excluded from every count, not zeroed.` };
+    render();
+  }
+
+  // ---------- Ledger ----------
+  function summary(e) {
+    const b = e.body;
+    switch (e.kind) {
+      case "fixture_loaded": return "Fictional demo data begins here.";
+      case "webscript_drafted": return `${b.webscript_id} v${b.version} drafted by ${b.drafted_by}`;
+      case "question_approved": return `${b.qid} approved by ${b.approved_by}`;
+      case "question_rejected": return `${b.qid} rejected by ${b.by}: ${b.reason}`;
+      case "rubric_approved": return `rubric approved by ${b.approved_by} (weights: ${b.weight_use})`;
+      case "webscript_locked": return `v${b.version} locked by ${b.locked_by} · ${short(b.seal)}`;
+      case "trigger_reviewed": return `${b.fixture}: ${b.verdict.replace(/_/g, " ")} (${b.by})`;
+      case "dry_run_reviewed": return `dry run of v${b.version} recorded by ${b.by}`;
+      case "session_opened": return `${b.session} opened for ${b.candidate}`;
+      case "session_events": return `${b.session}: causal ${b.causal_language}, restated ${b.restated}, open objections ${b.open_objections}`;
+      case "observation_recorded": return `${b.candidate} · ${b.criterion} · ${b.level === S.UNDETERMINED ? "undetermined" : `level ${b.level}`}`;
+      case "observation_overridden": return `${b.candidate} · ${b.criterion}: ${b.from} → ${b.to} by ${b.by}`;
+      case "session_completed": return `${b.session} completed`;
+      case "session_paused": return `${b.session} paused by ${b.by}`;
+      case "session_resumed": return `${b.session} resumed by ${b.by}`;
+      case "session_stopped": return `${b.session} stopped (${b.condition}) · NO_SCORE`;
+      case "charter_event": return `${b.type.replace(/_/g, " ")}: ${b.description}`;
+      case "teaching_action": return `${b.draft_id} ${b.decision} by ${b.by}`;
+      case "content_erased": return `content ${short(b.content_ref)} erased by ${b.by}`;
+      default: return "";
+    }
+  }
+  function viewLedger() {
+    const payload = S.ledgerPayload(state.ledger);
+    const check = S.verifyLedgerPayload(payload);
+    const kinds = [...new Set(state.ledger.entries.map((e) => e.kind))].sort();
+    const shown = state.ledger.entries.filter((e) => !ui.ledgerFilter || e.kind === ui.ledgerFilter);
+    const d = derive();
+    const refs = Object.keys(state.content);
+    return h("div", { class: "view" },
+      vhead("Append-only · hash-chained · checkable without us", "Ledger",
+        "Every approval, lock, override, stop and erasure is an entry. Nothing is edited or deleted; corrections are new entries. The format is tactik_eval's, so two independent verifiers can check this record."),
+      flashBox(),
+      h("div", { class: "panel panel--status" },
+        h("div", { class: "row" }, h("h3", null, `${payload.entries.length} entries`), check.ok ? pill("Chain verifies", "ok") : pill("Chain broken", "bad")),
+        h("dl", { class: "kv" }, h("dt", null, "Head"), h("dd", { class: "mono" }, payload.head)),
+        !check.ok ? h("ul", { class: "plain small", style: "color: var(--crimson)" }, check.problems.map((p) => h("li", null, p))) : null,
+        h("div", { class: "row" },
+          h("button", { type: "button", class: "btn btn--primary", onclick: () => copyText(JSON.stringify(payload, null, 2), "ledger") }, "Copy ledger JSON"),
+          h("button", { type: "button", class: "btn", onclick: () => copyText(JSON.stringify({ webscript: ws(), seal: S.digest(ws()) }, null, 2), "webscript-l") }, "Copy Webscript JSON")),
+        ui.jsonShown === "ledger" ? h("textarea", { readonly: true, rows: 10, class: "mono", id: "ledger-json", value: JSON.stringify(payload, null, 2) }) : null,
+        ui.jsonShown === "webscript-l" ? h("textarea", { readonly: true, rows: 10, class: "mono", id: "ws-json-l", value: JSON.stringify({ webscript: ws(), seal: S.digest(ws()) }, null, 2) }) : null,
+        h("p", { class: "small muted" }, "Save the copied JSON to a file, then check it from the repository with no help from this page:"),
+        h("pre", { class: "cmd" }, "node verify/verify.mjs ledger.json\npython3 -m tactik_eval.verify ledger.json\npython3 -m tactik_eval.edu webscript.json")),
+      h("div", { class: "row" },
+        h("label", { class: "small", for: "ledger-filter" }, "Show ",
+          h("select", { id: "ledger-filter", onchange: (e) => { ui.ledgerFilter = e.target.value; render(); } },
+            h("option", { value: "" }, "all kinds"), kinds.map((k) => h("option", { value: k, selected: ui.ledgerFilter === k }, k))))),
+      h("div", { class: "tablewrap" }, h("table", null,
+        h("thead", null, h("tr", null, h("th", { class: "num" }, "#"), h("th", null, "Kind"), h("th", null, "What it says"), h("th", null, "Link"))),
+        h("tbody", null, shown.slice().reverse().map((e) => h("tr", null,
+          h("td", { class: "num" }, e.index), h("td", null, h("code", null, e.kind)), h("td", null, summary(e)), h("td", { class: "mono" }, short(e.link))))))),
+      section("Content store", `Candidate and rater text lives here, outside the chain: ${refs.length} item${refs.length === 1 ? "" : "s"} stored, ${d.erased.size} erased. An entry body holds only the salted hash.`,
+        h("p", { class: "small muted" }, "Erase text from the readiness view. Erasing removes the text and its salt from this browser and appends a content_erased entry. The chain still verifies.")),
+      section("Check a ledger someone sent you", "Paste a ledger JSON. This uses the page's own implementation of docs/HASHING.md. For an independent check, use the repository commands above.",
+        h("textarea", { id: "paste-ledger", rows: 5, class: "mono", placeholder: "{\"head\": \"…\", \"entries\": [ … ]}" }),
+        h("div", { class: "row" }, h("button", { type: "button", class: "btn", onclick: () => {
+          const raw = document.getElementById("paste-ledger").value;
+          try { ui.pasteResult = S.verifyLedgerPayload(JSON.parse(raw)); } catch (err) { ui.pasteResult = { ok: false, problems: [`not valid JSON: ${err.message}`], head: "", count: 0 }; }
+          render();
+        } }, "Verify")),
+        ui.pasteResult ? (ui.pasteResult.ok
+          ? h("div", { class: "ok-box" }, h("div", { class: "ok-box__title" }, "Verifies"), h("p", { class: "mono" }, `${ui.pasteResult.count} entries · head ${ui.pasteResult.head}`))
+          : h("div", { class: "refusal" }, h("div", { class: "refusal__title" }, "Does not verify"), h("ul", { class: "plain small" }, ui.pasteResult.problems.map((p) => h("li", null, p))))) : null),
+      section("Reset this demo", "Discards this browser's copy, ledger included, and reloads the fixture. A real deployment has no such control; this exists because the data here is fictional.",
+        ui.confirmReset
+          ? h("div", { class: "row" },
+            h("span", { class: "small", style: "color: var(--crimson)" }, `This discards ${state.ledger.entries.length} entries. Head before reset: ${short(payload.head)}`),
+            h("button", { type: "button", class: "btn btn--danger", onclick: () => { state = S.seedState(state.actor); ui.confirmReset = false; ui.flash = { tone: "ok", text: "The demo was reset to the fixture." }; save(); render(); } }, "Discard and reload"),
+            h("button", { type: "button", class: "btn", onclick: () => { ui.confirmReset = false; render(); } }, "Keep"))
+          : h("div", { class: "row" }, h("button", { type: "button", class: "btn btn--danger", onclick: () => { ui.confirmReset = true; render(); } }, "Reset demo"))));
+  }
+
+  // ---------- Boundaries ----------
+  function viewBoundaries() {
+    return h("div", { class: "view" },
+      vhead("What this tool is, and is not", "Boundaries",
+        "TACTIK challenges, checks and tracks. It does not write, complete, submit or grade student work, and it does not imitate a real person."),
+      h("div", { class: "grid2" },
+        h("div", { class: "panel" }, h("h3", null, "Faculty can"),
+          h("ul", { class: "plain small" },
+            h("li", null, "Approve, edit or reject every question, with the reason recorded"),
+            h("li", null, "Define what each pressure level means"),
+            h("li", null, "Version-lock a script so every session can prove which script it ran"),
+            h("li", null, "Validate each trigger against fixtures and style pairs"),
+            h("li", null, "Override any observation, with the original kept"),
+            h("li", null, "Pause or stop any session; a stop voids it"),
+            h("li", null, "Erase candidate text while keeping the record verifiable"))),
+        h("div", { class: "panel" }, h("h3", null, "The studio never"),
+          h("ul", { class: "plain small" },
+            h("li", null, "Produces a grade, a total, or a predicted grade"),
+            h("li", null, "Lets an unapproved question reach a candidate"),
+            h("li", null, "Edits or deletes a ledger entry"),
+            h("li", null, "Calls an AI model or sends anything over the network"),
+            h("li", null, "Uses a real person's name, voice, likeness or biography"),
+            h("li", null, "Carries an institution's name or logo without written permission")))),
+      section("Data in this demo", null,
+        h("div", { class: "tablewrap" }, h("table", null,
+          h("thead", null, h("tr", null, h("th", null, "What"), h("th", null, "Where it is"), h("th", null, "Status"))),
+          h("tbody", null,
+            h("tr", null, h("td", null, "Dossier, candidates, rater notes"), h("td", null, "This page and this browser"), h("td", null, "Fictional")),
+            h("tr", null, h("td", null, "Your approvals and overrides"), h("td", null, "This browser's local storage"), h("td", null, "Lost if site data is cleared")),
+            h("tr", null, h("td", null, "Network"), h("td", null, "Font stylesheet only"), h("td", null, "No AI call, no analytics, no upload"))))),
+        h("p", { class: "small muted" }, "Real candidate data needs a server, roles, a written data agreement, and the institution's IRB or institutional determination first (proposal p.17). Nothing on this page is that.")),
+      section("What this does not establish", null,
+        h("ul", { class: "plain" },
+          h("li", null, "That rehearsal improves defense performance. Only the pilot's measures can show that (RQ1–RQ3, p.19)."),
+          h("li", null, "That the disclosed trigger rules are adequate. The trigger lab shows they are not yet: they miss paraphrase and react to phrasing."),
+          h("li", null, "That the levels mean the same thing across criteria. No calibration has been done, which is why no composite exists."),
+          h("li", null, "Compliance with FERPA or any institutional policy. Browser-only fictional data proves nothing about that."))));
+  }
+
+  // ---------- render ----------
+  function render() {
+    const y = window.scrollY;
+    const views = { webscript: viewWebscript, triggers: viewTriggers, dryrun: viewDryRun, readiness: viewReadiness, controls: viewControls, ledger: viewLedger, boundaries: viewBoundaries };
+    let node;
+    try {
+      node = views[ui.tab]();
+    } catch (err) {
+      node = h("div", { class: "refusal" }, h("div", { class: "refusal__title" }, "This view failed"), h("p", null, err.message));
+    }
+    document.getElementById("view").replaceChildren(node);
+    const check = S.verifyLedgerPayload(S.ledgerPayload(state.ledger));
+    document.getElementById("alarm").replaceChildren(check.ok ? "" : h("div", { class: "alarm", role: "alert" },
+      h("strong", null, "This browser's ledger no longer verifies. "), "Someone or something edited stored entries. The studio will not repair it; see the Ledger view."));
+    renderNav();
+    window.scrollTo(0, y);
+  }
+
+  const actorInput = document.getElementById("actor");
+  actorInput.value = state.actor || "";
+  actorInput.addEventListener("input", (e) => { state.actor = e.target.value; save(); });
+  window.addEventListener("hashchange", () => {
+    const t = (location.hash || "").replace("#", "");
+    if (TABS.some((x) => x.id === t) && t !== ui.tab) { ui.tab = t; render(); }
+  });
+  render();
+  save();
+})();
+</script>
